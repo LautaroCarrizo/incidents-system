@@ -1,0 +1,122 @@
+# ============================================
+# 🔧 General
+# ============================================
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# ============================================
+# 🔐 Configuración sensible
+# ============================================
+apps/*/.env
+apps/*/.env.*
+packages/*/.env
+packages/*/.env.*
+apps/api/.env
+*.pem
+*.key
+*.crt
+*.p12
+*.cert
+*.secret
+
+# ============================================
+# 🧩 Dependencias de monorepo
+# ============================================
+.pnpm-store/
+.pnpm-debug.log*
+pnpm-debug.log*
+.npmrc
+.yarnrc
+.yarn/
+npm-debug.log*
+lerna-debug.log*
+
+# ============================================
+# 🚀 Turborepo / Build caches
+# ============================================
+.turbo/
+turbo/
+turbo.log
+
+# ============================================
+# 🧱 IDE / Sistema operativo
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.log
+*.tmp
+*.bak
+*.old
+
+# ============================================
+# 🐳 Docker / Contenedores
+# ============================================
+docker-compose.override.yml
+.docker/
+*.pid
+*.sock
+
+# ============================================
+# 🧠 TypeScript / Lint
+# ============================================
+*.tsbuildinfo
+eslintcache
+
+# ============================================
+# 📱 React Native / Expo
+# ============================================
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+apps/mobile/ios/
+apps/mobile/android/
+apps/mobile/.gradle/
+apps/mobile/.idea/
+apps/mobile/.vs/
+apps/mobile/.vscode/
+apps/mobile/.bundle/
+apps/mobile/node_modules/
+
+# ============================================
+# 🧰 Logs / Datos temporales
+# ============================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+
+# ============================================
+# 💾 Base de datos local
+# ============================================
+data/
+dump.sql
+*.db
+*.sqlite
+*.sql
+
+# ============================================
+# 🗂️ Misc
+# ============================================
+package-lock.json
+yarn.lock
+# (dejamos pnpm-lock.yaml, ya que pnpm lo usa correctamente)
