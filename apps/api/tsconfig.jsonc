@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    // Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+
+    // Node ESM
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "ES2022",
+    "types": ["node"],
+    "lib": ["ES2022"],
+
+    // Emisión y mapas
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Reglas de tipo
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Módulos
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}

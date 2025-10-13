@@ -1,3 +1,14 @@
+# pnpm-workspace.yaml
+# Archivo raíz que define todos los paquetes del monorepo
+
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  # Apps principales (frontend y backend)
+  - "apps/*"
+  # Librerías o módulos compartidos
+  - "packages/*"
+
+# Dependencias que PNPM no debe intentar compilar en postinstall
+# (útil para librerías con binarios nativos o bundlers)
+ignoredBuiltDependencies:
+  - bcrypt
+  - esbuild
