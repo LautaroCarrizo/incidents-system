@@ -1,15 +1,19 @@
-import  {config } from 'dotenv-safe';
+import dotenvSafe from 'dotenv-safe';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { z } from 'zod';
 
-// 1️⃣ Cargar las variables del entorno (.env y .env.example)
-config({
+// ESM-safe __dirname / __filename
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Cargar .env usando rutas relativas a apps/api/
+dotenvSafe.config({
   allowEmptyValues: false,
   example: path.resolve(__dirname, '../../.env.example'),
   path: path.resolve(__dirname, '../../.env'),
 });
 
-// 2️⃣ Validar y tipar las variables con Zod
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
   PORT: z.coerce.number().default(3000),
@@ -34,17 +38,11 @@ const envSchema = z.object({
   COOKIE_SECURE: z.coerce.boolean().default(false),
   COOKIE_DOMAIN: z.string().optional(),
 
-  S3_ENDPOINT: z.string().optional(),
-  S3_ACCESS_KEY: z.string().optional(),
-  S3_SECRET_KEY: z.string().optional(),
-  S3_BUCKET: z.string().optional(),
-
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   LOG_PRETTY: z.coerce.boolean().default(false),
 });
 
 const parsed = envSchema.safeParse(process.env);
-
 if (!parsed.success) {
   console.error('❌ Error de variables de entorno:');
   console.error(parsed.error.format());
