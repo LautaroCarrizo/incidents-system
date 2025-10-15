@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: incidents-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root        # usuario root
+      MYSQL_DATABASE: incidents             # base que se crea al inicio
+      MYSQL_USER: app                       # usuario de aplicación
+      MYSQL_PASSWORD: sql039271password               # clave del usuario
+    ports:
+      - "3307:3306"                     # expone MySQL en tu host
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
+    volumes:
+      - mysql_data:/var/lib/mysql           # datos persistentes
+
+volumes:
+  mysql_data:
