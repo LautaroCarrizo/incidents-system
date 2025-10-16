@@ -1,4 +1,4 @@
-import { AgentStatus } from "../enums/agentStatus.js";
+import { AgentStatus } from "../../enums/agentStatus.js";
 
 export interface AgentInfoDto {
   id: number;

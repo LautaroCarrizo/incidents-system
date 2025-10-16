@@ -1,6 +1,0 @@
-export enum IncidentType {
-  ASALTO = "ASALTO",
-  INCENDIO = "INCENDIO",
-  ACCIDENTE = "ACCIDENTE",
-  EMERGENCIA = "EMERGENCIA",
-}

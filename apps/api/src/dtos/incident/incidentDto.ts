@@ -1,4 +1,4 @@
-import { IncidentType } from "../enums/incidentType.js";
+import { IncidentType } from "../../enums/incidentType.js";
 
 export interface IncidentInfoDto {
   id: number;
