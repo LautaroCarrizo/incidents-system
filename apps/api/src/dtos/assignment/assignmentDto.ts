@@ -1,4 +1,4 @@
-import { AssignmentStatus } from "../enums/assignmentStatus.js";
+import { AssignmentStatus } from "../../enums/assignmentStatus.js";
 
 export interface AssignmentInfoDto {
   id: number;
