@@ -5,7 +5,7 @@ import { connectDB } from "./config/db.js";
 import { disconnectDB } from "./config/db.js";
 import { healthRouter } from "./config/health.js";
 import { logger } from "./config/logger.js";
-
+import { incidentRouter } from "./routes/incidents/incidentsRoutes.js";
 async function bootstrap() {
   const app = express();
 
@@ -15,6 +15,8 @@ async function bootstrap() {
   // 2) Rutas de salud (liveness/readiness)
   app.use('/', healthRouter);
 
+
+  app.use("/api/v1/incidents", incidentRouter);
   // 3) Conectar dependencias críticas ANTES de aceptar tráfico
   await connectDB();
 

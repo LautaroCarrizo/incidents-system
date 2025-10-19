@@ -1,1 +1,1 @@
-{ "pipeline": { "build": { "dependsOn": ["^build"] }, "dev": {}, "lint": {} } }
+{ "tasks": { "build": { "dependsOn": ["^build"] }, "dev": {}, "lint": {} } }

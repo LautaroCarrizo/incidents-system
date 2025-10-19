@@ -15,7 +15,6 @@ export const IncidentCreateSchema = z.object({
     .refine(v => v === null || (typeof v === "number" && v >= -180 && v <= 180), "Longitud inválida")
     .transform(v => v ?? null),
   address: z.string().max(255).optional().nullable().transform(v => v ?? null),
-  reporterId: z.number().int().positive().optional(),
 });
 export type IncidentCreateInput = z.infer<typeof IncidentCreateSchema>;
 
@@ -32,6 +31,6 @@ export type IncidentUpdateInput = z.infer<typeof IncidentUpdateSchema>;
 export const IncidentQuerySchema = PaginationQueryZ.extend({
   status: IncidentStatusZ.optional(),
   typeIncident: IncidentTypeZ.optional(),
-  search: z.string().min(1).max(200).optional(), 
+  search: z.string().min(1).max(200).optional(),
 });
 export type IncidentQueryInput = z.infer<typeof IncidentQuerySchema>;
