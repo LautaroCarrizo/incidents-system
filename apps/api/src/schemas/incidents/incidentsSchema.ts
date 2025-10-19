@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { PaginationQueryZ } from "../pagination/pagination";
-import { IncidentStatusZ, IncidentTypeZ } from "../../enums/enumsWithZod";
+import { PaginationQueryZ } from "../pagination/pagination.js";
+import { IncidentStatusZ, IncidentTypeZ } from "../../enums/enumsWithZod.js";
 
 const LatZ = z.number().gte(-90).lte(90);
 const LngZ = z.number().gte(-180).lte(180);
