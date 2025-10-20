@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PaginationQueryZ } from "../pagination/pagination.ts";
+import { PaginationQueryZ } from "../pagination/pagination.js";
 
 export const UserCreateSchema = z.object({
   name: z.string().min(2).max(80),
