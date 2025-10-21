@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../../config/db.js";
+import { sequelize } from "../../config/db/sequelizeConn.js";
 
 const User = sequelize.define(
-  "User",
+  "users",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -28,6 +28,7 @@ const User = sequelize.define(
     },
   },
   {
+    tableName: "users",
     timestamps: false,
   }
 );

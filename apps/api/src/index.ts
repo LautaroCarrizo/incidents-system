@@ -1,8 +1,8 @@
 import express from "express";
 import { env } from "./config/env.js";
 import { applyAppMiddlewares } from "./config/app.js";
-import { connectDB } from "./config/db.js";
-import { disconnectDB } from "./config/db.js";
+import { connectDB } from "./config/db/db.js";
+import { disconnectDB } from "./config/db/db.js";
 import { healthRouter } from "./config/health.js";
 import { logger } from "./config/logger.js";
 import { incidentRouter } from "./routes/incidents/incidentsRoutes.js";

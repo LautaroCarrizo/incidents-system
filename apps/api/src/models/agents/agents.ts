@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../../config/db.js";
+import { sequelize } from "../../config/db/sequelizeConn.js";
 
 export const Agent = sequelize.define(
-  "Agent",
+  "agents",
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 

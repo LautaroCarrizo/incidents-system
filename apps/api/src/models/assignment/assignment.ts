@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../../config/db.js";
+import { sequelize } from "../../config/db/sequelizeConn.js";
 
 export const ASSIGNMENT_STATUS = [
   "ASSIGNED",
@@ -12,7 +12,7 @@ export const ASSIGNMENT_STATUS = [
 ];
 
 export const Assignment = sequelize.define(
-  "Assignment",
+  "assignments",
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 

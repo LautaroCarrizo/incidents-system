@@ -1,9 +1,9 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../../config/db.js";
+import { sequelize } from "../../config/db/sequelizeConn.js";
 
 
 const Incident = sequelize.define(
-  "Incident",
+  "incidents",
   {
     id: {
       type: DataTypes.INTEGER,
