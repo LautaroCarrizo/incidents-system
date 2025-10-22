@@ -1,0 +1,79 @@
+import { Op } from "sequelize";
+import User from "../../models/users/user.js";
+
+class UserRepo {
+  async findAll(params: {
+    page: number;
+    pageSize: number;
+    search?: string | undefined;
+    sort?: string | undefined;
+    isAdmin?: boolean | undefined;
+  }) {
+    const { page, pageSize, search, sort, isAdmin } = params;
+
+    const where: any = {};
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { email: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    let order: any = [["id", "ASC"]];
+    if (sort) {
+      const dir = sort.startsWith("-") ? "DESC" : "ASC";
+      const field = sort.replace(/^[+-]/, "");
+      order = [[field, dir]];
+    }
+
+    const { rows, count } = await User.findAndCountAll({
+      where,
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+      order,
+    });
+
+    return { rows, count, page, pageSize };
+  }
+  async create(data: {
+    name: string;
+    email: string;
+    password: string;
+    isAdmin?: boolean;
+  }) {
+    return User.create(data);
+  }
+
+  async findById(id: number) {
+    return User.findByPk(id);
+  }
+
+  async findByEmail(email: string) {
+    return User.findOne({ where: { email } });
+  }
+
+  async existsEmail(email: string): Promise<boolean> {
+    const count = await User.count({ where: { email } });
+    return count > 0;
+  }
+
+  async updatePartial(
+    id: number,
+    patch: Partial<{
+      name: string;
+      email: string;
+      password: string;
+      isAdmin: boolean;
+    }>
+  ) {
+    const user = await User.findByPk(id);
+    if (!user) return null;
+    await user.update(patch as any);
+    return user;
+  }
+
+  async deleteHard(id: number) {
+    return User.destroy({ where: { id } });
+  }
+}
+export const userRepo = new UserRepo();
