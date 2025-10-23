@@ -1,6 +1,6 @@
 // src/modules/incidents/incidents.repo.ts
 import { Op } from "sequelize";
-import { Incident } from "../../models/incidents/incidents.js";
+import { IncidentModel } from "../../models/incidents/incidents.js";
 import type { IncidentCreateInput } from "../../schemas/incidents/incidentsSchema.js";
 class IncidentRepo {
   async findAll(query: any) {
@@ -20,7 +20,7 @@ class IncidentRepo {
 
     const offset = (page - 1) * pageSize;
 
-    const { rows, count } = await Incident.findAndCountAll({
+    const { rows, count } = await IncidentModel.findAndCountAll({
       where,
       order,
       limit: pageSize,
@@ -31,21 +31,21 @@ class IncidentRepo {
   }
 
   async findById(id: number) {
-    return await Incident.findByPk(id);
+    return await IncidentModel.findByPk(id);
   }
 
   async create(data: IncidentCreateInput & { reporterId?: number} ) {
-    return await Incident.create(data);
+    return await IncidentModel.create(data);
   }
 
   async update(id: number, data: any) {
-    const incident = await Incident.findByPk(id);
+    const incident = await IncidentModel.findByPk(id);
     if (!incident) return null;
     return await incident.update(data);
   }
 
   async delete(id: number) {
-    const incident = await Incident.findByPk(id);
+    const incident = await IncidentModel.findByPk(id);
     if (!incident) return null;
     await incident.destroy();
     return true;

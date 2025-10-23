@@ -1,18 +1,33 @@
-import User from "../users/user.js";
-import { Incident } from "../incidents/incidents.js";
-import { Agent } from "../agents/agents.js";
-import { Assignment } from "../assignment/assignment.js";
+import { UserModel } from "../users/user.js";
+import { IncidentModel } from "../incidents/incidents.js";
+import { AgentModel } from "../agents/agents.js";
+import { AssignmentModel } from "../assignment/assignment.js";
 
 export function applyRelations() {
-  User.hasOne(Agent, { foreignKey: "userId", as: "agentProfile" });
-  Agent.belongsTo(User, { foreignKey: "userId", as: "user" });
+  UserModel.hasOne(AgentModel, { foreignKey: "userId", as: "agentProfile" });
+  AgentModel.belongsTo(UserModel, { foreignKey: "userId", as: "user" });
 
-  User.hasMany(Incident, { foreignKey: "reporterId", as: "reportedIncidents" });
-  Incident.belongsTo(User, { foreignKey: "reporterId", as: "reporter" });
+  UserModel.hasMany(IncidentModel, {
+    foreignKey: "reporterId",
+    as: "reportedIncidents",
+  });
+  IncidentModel.belongsTo(UserModel, {
+    foreignKey: "reporterId",
+    as: "reporter",
+  });
 
-  Incident.hasMany(Assignment, { foreignKey: "incidentId", as: "assignments" });
-  Assignment.belongsTo(Incident, { foreignKey: "incidentId", as: "incident" });
+  IncidentModel.hasMany(AssignmentModel, {
+    foreignKey: "incidentId",
+    as: "assignments",
+  });
+  AssignmentModel.belongsTo(IncidentModel, {
+    foreignKey: "incidentId",
+    as: "incident",
+  });
 
-  Agent.hasMany(Assignment, { foreignKey: "agentId", as: "assignments" });
-  Assignment.belongsTo(Agent, { foreignKey: "agentId", as: "agent" });
+  AgentModel.hasMany(AssignmentModel, {
+    foreignKey: "agentId",
+    as: "assignments",
+  });
+  AssignmentModel.belongsTo(AgentModel, { foreignKey: "agentId", as: "agent" });
 }
