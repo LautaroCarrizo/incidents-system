@@ -5,17 +5,17 @@ import { z } from "zod";
    ============================================================ */
 
 export const IncidentTypeZ = z.enum([
-  "ASALTO",
-  "INCENDIO",
-  "ACCIDENTE",
-  "EMERGENCIA",
+  "ROBBERY",
+  "FIRE",
+  "ACCIDENT",
+  "EMERGENCY",
 ]);
 export type IncidentType = z.infer<typeof IncidentTypeZ>;
 
 export const IncidentStatusZ = z.enum([
-  "PENDIENTE",
-  "EN_PROGRESO",
-  "RESUELTO",
+  "PENDING",
+  "IN_PROGRESS",
+  "SOLVED",
 ]);
 export type IncidentStatus = z.infer<typeof IncidentStatusZ>;
 

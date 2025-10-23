@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import User from "../../models/users/user.js";
+import { UserModel } from "../../models/users/user.js";
 
 class UserRepo {
   async findAll(params: {
@@ -26,7 +26,7 @@ class UserRepo {
       order = [[field, dir]];
     }
 
-    const { rows, count } = await User.findAndCountAll({
+    const { rows, count } = await UserModel.findAndCountAll({
       where,
       limit: pageSize,
       offset: (page - 1) * pageSize,
@@ -41,19 +41,19 @@ class UserRepo {
     password: string;
     isAdmin?: boolean;
   }) {
-    return User.create(data);
+    return UserModel.create(data);
   }
 
   async findById(id: number) {
-    return User.findByPk(id);
+    return UserModel.findByPk(id);
   }
 
   async findByEmail(email: string) {
-    return User.findOne({ where: { email } });
+    return UserModel.findOne({ where: { email } });
   }
 
   async existsEmail(email: string): Promise<boolean> {
-    const count = await User.count({ where: { email } });
+    const count = await UserModel.count({ where: { email } });
     return count > 0;
   }
 
@@ -66,14 +66,14 @@ class UserRepo {
       isAdmin: boolean;
     }>
   ) {
-    const user = await User.findByPk(id);
+    const user = await UserModel.findByPk(id);
     if (!user) return null;
     await user.update(patch as any);
     return user;
   }
 
   async deleteHard(id: number) {
-    return User.destroy({ where: { id } });
+    return UserModel.destroy({ where: { id } });
   }
 }
 export const userRepo = new UserRepo();

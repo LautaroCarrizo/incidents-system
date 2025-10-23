@@ -1,54 +1,99 @@
-import { DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../../config/db/sequelizeConn.js";
+import type {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from "sequelize";
+import { AgentStatusZ, type AgentStatus } from "../../enums/enumsWithZod.js";
 
-export const Agent = sequelize.define(
-  "agents",
+const AGENT_STATUS = AgentStatusZ.options;
+
+export class AgentModel extends Model<
+  InferAttributes<AgentModel, { omit: "createdAt" | "updatedAt" }>, // atributos existentes al leer
+  InferCreationAttributes<AgentModel, { omit: "createdAt" | "updatedAt" }> // atributos requeridos al crear
+> {
+  declare id: CreationOptional<number>;
+  declare userId: number;
+  declare status: CreationOptional<AgentStatus>;
+  declare capacity: CreationOptional<number>;
+  declare activeAssignmentsCount: CreationOptional<number>;
+  declare jurisdiction: CreationOptional<string | null>;
+  declare isOnCall: CreationOptional<boolean>;
+  declare autoAccept: CreationOptional<boolean>;
+  declare lastSeenAt: CreationOptional<Date | null>;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
+}
+
+AgentModel.init(
   {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
 
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      unique: true,
-      references: { model: "users", key: "id" },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
     },
 
     status: {
-      type: DataTypes.ENUM("AVAILABLE", "BUSY", "OFFLINE"),
+      type: DataTypes.ENUM(...AGENT_STATUS),
       allowNull: false,
-      defaultValue: "OFFLINE",
+      defaultValue: "OFFLINE" satisfies AgentStatus,
     },
 
-    capacity: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 3 },
+    capacity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 3,
+    },
+
     activeAssignmentsCount: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
 
-    jurisdiction: { type: DataTypes.STRING(120), allowNull: true },
+    jurisdiction: {
+      type: DataTypes.STRING(120),
+      allowNull: true,
+      defaultValue: null,
+    },
+
     isOnCall: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
+
     autoAccept: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
 
-    lastSeenAt: { type: DataTypes.DATE, allowNull: true },
+    lastSeenAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null,
+    },
   },
+
   {
+    sequelize,
     tableName: "agents",
     timestamps: true,
-    indexes: [
-      { fields: ["status"] },
-      { fields: ["jurisdiction"] },
-      { unique: true, fields: ["userId"] },
-    ],
+    underscored: false,
   }
 );
+export type AgentAttributes = InferAttributes<
+  AgentModel,
+  { omit: "createdAt" | "updatedAt" }
+>;
+export type AgentCreationAttributes = InferCreationAttributes<
+  AgentModel,
+  { omit: "createdAt" | "updatedAt" }
+>;
