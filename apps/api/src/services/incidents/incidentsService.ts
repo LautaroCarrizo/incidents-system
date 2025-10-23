@@ -1,10 +1,20 @@
 import { incidentRepo } from "../../repositories/incidents/incidentsRepo.js";
-import type { IncidentCreateInput, IncidentQueryInput, IncidentUpdateInput } from "../../schemas/incidents/incidentsSchema.js";
+import {
+  IncidentUpdateSchema,
+  type IncidentCreateInput,
+  type IncidentQueryInput,
+  type IncidentUpdateInput,
+} from "../../schemas/incidents/incidentsSchema.js";
 
- class IncidentService {
+class IncidentService {
   async paginate(query: IncidentQueryInput) {
     const { rows, count } = await incidentRepo.findAll(query);
-    return { items: rows, total: count, page: query.page, pageSize: query.pageSize };
+    return {
+      items: rows,
+      total: count,
+      page: query.page,
+      pageSize: query.pageSize,
+    };
   }
 
   async create(input: IncidentCreateInput & { reporterId?: number }) {
@@ -22,13 +32,23 @@ import type { IncidentCreateInput, IncidentQueryInput, IncidentUpdateInput } fro
   }
 
   async update(id: number, input: IncidentUpdateInput) {
-    const updated = await incidentRepo.update(id, input);
-    if (!updated) {
-      const err = new Error("Incidente no encontrado");
+    const data = IncidentUpdateSchema.parse(input);
+    const i = await incidentRepo.findById(id);
+    if (!i) {
+      const err = new Error("Incidente no encontrado por id");
       (err as any).statusCode = 404;
       throw err;
     }
-    return updated;
+    const incidentToUpdate = {
+      typeIncident: data.typeIncident ?? i.typeIncident,
+      message: data.message ?? i.message,
+      latitude: data.latitude ?? i.latitude,
+      longitude: data.longitude ?? i.longitude,
+      address: data.address ?? i.address,
+      status: data.status ?? i.status,
+    };
+    const incidentUpdated = await incidentRepo.update(id, incidentToUpdate);
+    return incidentUpdated;
   }
 
   async softDelete(id: number) {
@@ -40,4 +60,4 @@ import type { IncidentCreateInput, IncidentQueryInput, IncidentUpdateInput } fro
     }
   }
 }
-export const incidentService = new IncidentService()
+export const incidentService = new IncidentService();

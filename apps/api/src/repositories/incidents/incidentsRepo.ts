@@ -1,6 +1,6 @@
 // src/modules/incidents/incidents.repo.ts
 import { Op } from "sequelize";
-import { IncidentModel } from "../../models/incidents/incidents.js";
+import { IncidentModel, type IncidentAttributes } from "../../models/incidents/incidents.js";
 import type { IncidentCreateInput } from "../../schemas/incidents/incidentsSchema.js";
 class IncidentRepo {
   async findAll(query: any) {
@@ -34,14 +34,27 @@ class IncidentRepo {
     return await IncidentModel.findByPk(id);
   }
 
-  async create(data: IncidentCreateInput & { reporterId?: number} ) {
+  async create(data: IncidentCreateInput & { reporterId?: number }) {
     return await IncidentModel.create(data);
   }
 
-  async update(id: number, data: any) {
+  async update(
+    id: number,
+    patch: Partial<
+      Pick<
+       IncidentAttributes,
+        | "typeIncident"
+        | "message"
+        | "latitude"
+        | "longitude"
+        | "address"
+        | "status"
+      >
+    >
+  ) {
     const incident = await IncidentModel.findByPk(id);
     if (!incident) return null;
-    return await incident.update(data);
+    return await incident.update(patch);
   }
 
   async delete(id: number) {
