@@ -1,4 +1,4 @@
-import { AssignmentStatus } from "../../enums/assignmentStatus.js";
+import type { AssignmentStatus } from "../../enums/enumsWithZod.js";
 
 export interface AssignmentInfoDto {
   id: number;
