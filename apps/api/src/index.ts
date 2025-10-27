@@ -6,6 +6,7 @@ import { disconnectDB } from "./config/db/db.js";
 import { healthRouter } from "./config/health.js";
 import { logger } from "./config/logger.js";
 import { incidentRouter } from "./routes/incidents/incidentsRoutes.js";
+import { userRouter } from "./routes/users/userRoute.js";
 async function bootstrap() {
   const app = express();
 
@@ -17,6 +18,7 @@ async function bootstrap() {
 
 
   app.use("/api/v1/incidents", incidentRouter);
+  app.use("/api/v1/users", userRouter)
   // 3) Conectar dependencias críticas ANTES de aceptar tráfico
   await connectDB();
 
