@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, type Transaction } from "sequelize";
 import { UserModel } from "../../models/users/user.js";
 
 class UserRepo {
@@ -12,6 +12,8 @@ class UserRepo {
     const { page, pageSize, search, sort, isAdmin } = params;
 
     const where: any = {};
+    if (typeof isAdmin === "boolean") where.isAdmin = isAdmin;
+
     if (search) {
       where[Op.or] = [
         { name: { [Op.like]: `%${search}%` } },
@@ -35,25 +37,35 @@ class UserRepo {
 
     return { rows, count, page, pageSize };
   }
-  async create(data: {
-    name: string;
-    email: string;
-    password: string;
-    isAdmin?: boolean;
-  }) {
-    return UserModel.create(data);
+
+  async create(
+    data: {
+      name: string;
+      email: string;
+      password?: string;
+      isAdmin?: boolean;
+    },
+    tx?: Transaction | null
+  ) {
+    return UserModel.create(data as any, tx ? { transaction: tx } : undefined);
   }
 
-  async findById(id: number) {
-    return UserModel.findByPk(id);
+  async findById(id: number, tx?: Transaction | null) {
+    return UserModel.findByPk(id, tx ? { transaction: tx } : undefined);
   }
 
-  async findByEmail(email: string) {
-    return UserModel.findOne({ where: { email } });
+  async findByEmail(email: string, tx?: Transaction | null) {
+    return UserModel.findOne({
+      where: { email },
+      ...(tx ? { transaction: tx } : {}),
+    });
   }
 
-  async existsEmail(email: string): Promise<boolean> {
-    const count = await UserModel.count({ where: { email } });
+  async existsEmail(email: string, tx?: Transaction | null): Promise<boolean> {
+    const count = await UserModel.count({
+      where: { email },
+      ...(tx ? { transaction: tx } : {}),
+    });
     return count > 0;
   }
 
@@ -62,18 +74,27 @@ class UserRepo {
     patch: Partial<{
       name: string;
       email: string;
-      password: string;
+      password?: string;
       isAdmin: boolean;
-    }>
+    }>,
+    tx?: Transaction | null
   ) {
-    const user = await UserModel.findByPk(id);
+    const user = await UserModel.findByPk(
+      id,
+      tx ? { transaction: tx } : undefined
+    );
     if (!user) return null;
-    await user.update(patch as any);
+
+    await user.update(patch as any, tx ? { transaction: tx } : undefined);
     return user;
   }
 
-  async deleteHard(id: number) {
-    return UserModel.destroy({ where: { id } });
+  async deleteHard(id: number, tx?: Transaction | null) {
+    return UserModel.destroy({
+      where: { id },
+      ...(tx ? { transaction: tx } : {}),
+    });
   }
 }
+
 export const userRepo = new UserRepo();

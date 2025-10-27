@@ -1,9 +1,14 @@
 // src/modules/incidents/incidents.repo.ts
-import { Op } from "sequelize";
-import { IncidentModel, type IncidentAttributes } from "../../models/incidents/incidents.js";
+import { Op, type Transaction } from "sequelize";
+import {
+  IncidentModel,
+  type IncidentAttributes,
+} from "../../models/incidents/incidents.js";
 import type { IncidentCreateInput } from "../../schemas/incidents/incidentsSchema.js";
+import type { IncidentQueryInput } from "../../schemas/incidents/incidentsSchema.js";
+
 class IncidentRepo {
-  async findAll(query: any) {
+  async findAll(query: IncidentQueryInput, tx?: Transaction | null) {
     const { page, pageSize, search, status, typeIncident, sort } = query;
 
     const where: any = {};
@@ -25,42 +30,39 @@ class IncidentRepo {
       order,
       limit: pageSize,
       offset,
+      ...(tx ? { transaction: tx } : {}),
     });
 
     return { rows, count };
   }
 
-  async findById(id: number) {
-    return await IncidentModel.findByPk(id);
+  async findById(id: number, tx?: Transaction | null) {
+    return IncidentModel.findByPk(id, tx ? { transaction: tx } : undefined);
   }
 
-  async create(data: IncidentCreateInput & { reporterId?: number }) {
-    return await IncidentModel.create(data);
+  async create(data: IncidentCreateInput, tx?: Transaction | null) {
+    return IncidentModel.create(data as any, tx ? { transaction: tx } : undefined);
   }
 
   async update(
     id: number,
     patch: Partial<
       Pick<
-       IncidentAttributes,
-        | "typeIncident"
-        | "message"
-        | "latitude"
-        | "longitude"
-        | "address"
-        | "status"
+        IncidentAttributes,
+        "typeIncident" | "message" | "latitude" | "longitude" | "address" | "status"
       >
-    >
+    >,
+    tx?: Transaction | null
   ) {
-    const incident = await IncidentModel.findByPk(id);
+    const incident = await IncidentModel.findByPk(id, tx ? { transaction: tx } : undefined);
     if (!incident) return null;
-    return await incident.update(patch);
+    return incident.update(patch as any, tx ? { transaction: tx } : undefined);
   }
 
-  async delete(id: number) {
-    const incident = await IncidentModel.findByPk(id);
+  async delete(id: number, tx?: Transaction | null) {
+    const incident = await IncidentModel.findByPk(id, tx ? { transaction: tx } : undefined);
     if (!incident) return null;
-    await incident.destroy();
+    await incident.destroy(tx ? { transaction: tx } : undefined);
     return true;
   }
 }
