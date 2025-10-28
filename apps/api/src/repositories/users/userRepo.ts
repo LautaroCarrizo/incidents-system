@@ -1,19 +1,25 @@
 import { Op, type Transaction } from "sequelize";
-import { UserModel } from "../../models/users/user.js";
+import {
+  UserModel,
+  type UserCreationAttributes,
+  type UserAttributes,
+} from "../../models/users/user.js";
 
 class UserRepo {
-  async findAll(params: {
-    page: number;
-    pageSize: number;
-    search?: string | undefined;
-    sort?: string | undefined;
-    isAdmin?: boolean | undefined;
-  }) {
+  async findAll(
+    params: {
+      page: number;
+      pageSize: number;
+      search?: string | undefined;
+      sort?: string | undefined;
+      isAdmin?: boolean;
+    },
+    tx?: Transaction | null
+  ) {
     const { page, pageSize, search, sort, isAdmin } = params;
 
     const where: any = {};
     if (typeof isAdmin === "boolean") where.isAdmin = isAdmin;
-
     if (search) {
       where[Op.or] = [
         { name: { [Op.like]: `%${search}%` } },
@@ -33,21 +39,14 @@ class UserRepo {
       limit: pageSize,
       offset: (page - 1) * pageSize,
       order,
+      ...(tx ? { transaction: tx } : {}),
     });
 
     return { rows, count, page, pageSize };
   }
 
-  async create(
-    data: {
-      name: string;
-      email: string;
-      password?: string;
-      isAdmin?: boolean;
-    },
-    tx?: Transaction | null
-  ) {
-    return UserModel.create(data as any, tx ? { transaction: tx } : undefined);
+  async create(data: UserCreationAttributes, tx?: Transaction | null) {
+    return UserModel.create(data, tx ? { transaction: tx } : undefined);
   }
 
   async findById(id: number, tx?: Transaction | null) {
@@ -71,12 +70,7 @@ class UserRepo {
 
   async updatePartial(
     id: number,
-    patch: Partial<{
-      name: string;
-      email: string;
-      password?: string;
-      isAdmin: boolean;
-    }>,
+    patch: Partial<Pick<UserAttributes, "name" | "email" | "isAdmin">>,
     tx?: Transaction | null
   ) {
     const user = await UserModel.findByPk(
@@ -84,16 +78,16 @@ class UserRepo {
       tx ? { transaction: tx } : undefined
     );
     if (!user) return null;
-
-    await user.update(patch as any, tx ? { transaction: tx } : undefined);
+    await user.update(patch, tx ? { transaction: tx } : undefined);
     return user;
   }
 
   async deleteHard(id: number, tx?: Transaction | null) {
-    return UserModel.destroy({
+    const n = await UserModel.destroy({
       where: { id },
       ...(tx ? { transaction: tx } : {}),
     });
+    return n > 0;
   }
 }
 

@@ -5,8 +5,11 @@ import type {
   InferCreationAttributes,
   CreationOptional,
 } from "sequelize";
-import { IncidentStatusZ, type IncidentStatus } from "../../enums/enumsWithZod.js"
-import { IncidentTypeZ, type IncidentType } from "../../enums/enumsWithZod.js"
+import {
+  IncidentStatusZ,
+  type IncidentStatus,
+} from "../../enums/enumsWithZod.js";
+import { IncidentTypeZ, type IncidentType } from "../../enums/enumsWithZod.js";
 
 const INCIDENT_STATUS_VALUE = IncidentStatusZ.options;
 const INCIDENT_TYPES_VALUE = IncidentTypeZ.options;
@@ -23,7 +26,6 @@ export class IncidentModel extends Model<
   declare address: CreationOptional<string | null>;
   declare reporterId: CreationOptional<number | null>;
   declare status: CreationOptional<IncidentStatus>;
-
   // timestamps manejados por Sequelize
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -36,7 +38,7 @@ IncidentModel.init(
     typeIncident: {
       type: DataTypes.ENUM(...INCIDENT_TYPES_VALUE),
       allowNull: false,
-      defaultValue:"EMERGENCY" satisfies IncidentType,
+      defaultValue: "EMERGENCY" satisfies IncidentType,
     },
 
     message: { type: DataTypes.STRING(500), allowNull: false },
@@ -66,7 +68,4 @@ export type IncidentAttributes = InferAttributes<
   IncidentModel,
   { omit: "createdAt" | "updatedAt" }
 >;
-export type IncidentCreationAttributes = InferCreationAttributes<
-  IncidentModel,
-  { omit: "createdAt" | "updatedAt" }
->;
+

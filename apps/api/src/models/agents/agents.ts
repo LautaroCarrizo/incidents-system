@@ -5,15 +5,22 @@ import type {
   InferCreationAttributes,
   CreationOptional,
 } from "sequelize";
-import { AgentStatusZ, type AgentStatus } from "../../enums/enumsWithZod.js";
+import {
+  AgentStatusZ,
+  AgentTypeZ,
+  type AgentStatus,
+  type AgentTypes,
+} from "../../enums/enumsWithZod.js";
 
 const AGENT_STATUS = AgentStatusZ.options;
-
+const AGENT_TYPES = AgentTypeZ.options;
 export class AgentModel extends Model<
-  InferAttributes<AgentModel, { omit: "createdAt" | "updatedAt" }>, // atributos existentes al leer
-  InferCreationAttributes<AgentModel, { omit: "createdAt" | "updatedAt" }> // atributos requeridos al crear
+  InferAttributes<AgentModel, { omit: "createdAt" | "updatedAt" }>,
+  InferCreationAttributes<AgentModel, { omit: "createdAt" | "updatedAt" }>
 > {
   declare id: CreationOptional<number>;
+  declare agentName: string;
+  declare agentType: CreationOptional<AgentTypes>;
   declare userId: number;
   declare status: CreationOptional<AgentStatus>;
   declare capacity: CreationOptional<number>;
@@ -32,6 +39,15 @@ AgentModel.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+    },
+    agentName: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+    },
+    agentType: {
+      type: DataTypes.ENUM(...AGENT_TYPES),
+      allowNull: false,
+      defaultValue: "POLICE" satisfies AgentTypes,
     },
 
     userId: {
