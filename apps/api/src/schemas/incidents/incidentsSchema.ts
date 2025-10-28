@@ -15,7 +15,7 @@ export const IncidentCreateSchema = z.object({
     .refine(v => v === null || (typeof v === "number" && v >= -180 && v <= 180), "Longitud inválida")
     .transform(v => v ?? null),
   address: z.string().max(255).optional().nullable().transform(v => v ?? null),
-    reporterId: z.number().int().positive().optional(),
+  reporterId: z.number().int().positive().optional().nullable()
 });
 export type IncidentCreateInput = z.infer<typeof IncidentCreateSchema>;
 

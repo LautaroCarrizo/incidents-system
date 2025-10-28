@@ -7,6 +7,7 @@ import {
 import type { IncidentCreateInput } from "../../schemas/incidents/incidentsSchema.js";
 import type { IncidentQueryInput } from "../../schemas/incidents/incidentsSchema.js";
 
+
 class IncidentRepo {
   async findAll(query: IncidentQueryInput, tx?: Transaction | null) {
     const { page, pageSize, search, status, typeIncident, sort } = query;
@@ -40,9 +41,19 @@ class IncidentRepo {
     return IncidentModel.findByPk(id, tx ? { transaction: tx } : undefined);
   }
 
-  async create(data: IncidentCreateInput, tx?: Transaction | null) {
-    return IncidentModel.create(data as any, tx ? { transaction: tx } : undefined);
-  }
+async create(data: IncidentCreateInput & { reporterId: number }, tx?: Transaction | null) {
+  return IncidentModel.create(
+    {
+      message: data.message,
+      typeIncident: data.typeIncident,
+      latitude: data.latitude ?? null,
+      longitude: data.longitude ?? null,
+      address: data.address ?? null,
+      reporterId: data.reporterId,
+    },
+    tx ? { transaction: tx } : undefined
+  );
+}
 
   async update(
     id: number,

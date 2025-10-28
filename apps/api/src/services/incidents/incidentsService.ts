@@ -25,21 +25,30 @@ class IncidentService {
 
   async create(input: unknown, reporterIdFromAuth?: number) {
     const data = IncidentCreateSchema.parse(input);
+
     const reporterId = reporterIdFromAuth ?? data.reporterId ?? null;
-    if (!reporterId) {
+    if (reporterId == null) {
       const err = new Error(
         "Debe especificarse un reporterId o estar autenticado"
       );
       (err as any).statusCode = 403;
       throw err;
     }
-    const payload: IncidentCreateInput = { ...data, reporterId };
+
+    const dto: IncidentCreateInput & { reporterId: number } = {
+      ...data,
+      reporterId,
+      latitude: data.latitude ?? null,
+      longitude: data.longitude ?? null,
+      address: data.address ?? null,
+    };
+
     const created = await sequelize.transaction(async (tx) => {
-      return incidentRepo.create(payload, tx);
+      return incidentRepo.create(dto, tx);
     });
+
     return toIncidentInfoDto(created);
   }
-
   async getByIdOrThrow(id: number) {
     const found = await incidentRepo.findById(id);
     if (!found) {

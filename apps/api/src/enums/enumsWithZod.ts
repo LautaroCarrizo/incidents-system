@@ -29,6 +29,13 @@ export const AgentStatusZ = z.enum([
 ]);
 export type AgentStatus = z.infer<typeof AgentStatusZ>;
 
+export const AgentTypeZ = z.enum([
+  "POLICE",
+  "AMBULANCE",
+  "FIREFIGHTERS",
+]);
+export type AgentTypes = z.infer<typeof AgentTypeZ>;
+
 /* ============================================================
    ASSIGNMENTS
    ============================================================ */
