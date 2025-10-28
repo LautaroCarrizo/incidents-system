@@ -68,4 +68,7 @@ export type IncidentAttributes = InferAttributes<
   IncidentModel,
   { omit: "createdAt" | "updatedAt" }
 >;
-
+export type IncidentCreationAttributes = InferCreationAttributes<
+  IncidentModel,
+  { omit: "createdAt" | "updatedAt" }
+>;
