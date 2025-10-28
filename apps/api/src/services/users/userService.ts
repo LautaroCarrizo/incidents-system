@@ -4,6 +4,7 @@ import {
   UserCreateSchema,
   type UserQueryInput,
   type UserUpdateInput,
+  type UserCreateInput,
 } from "../../schemas/user/userSchema.js";
 import { toUserInfoDto, toUserListDto } from "../../dtos/user/userDto.js";
 import { sequelize } from "../../config/db/sequelizeConn.js";
@@ -19,7 +20,7 @@ class UserService {
     };
   }
 
-  async create(input: unknown, _ctx?: { userId?: number }) {
+  async create(input: unknown) {
     const data = UserCreateSchema.parse(input);
 
     const existing = await userRepo.findByEmail(data.email);
@@ -28,19 +29,14 @@ class UserService {
       (err as any).statusCode = 409;
       throw err;
     }
+    const dto: UserCreateInput = {
+      ...data,
+      isAdmin: data.isAdmin ?? false,
+    };
 
     const user = await sequelize.transaction(async (tx) => {
-      const created = await userRepo.create(
-        {
-          name: data.name,
-          email: data.email,
-          isAdmin: data.isAdmin ?? false,
-        } as any,
-        tx
-      );
-      return created;
+      userRepo.create(dto, tx);
     });
-
     return toUserInfoDto(user);
   }
 
