@@ -20,26 +20,29 @@ class UserService {
     };
   }
 
-  async create(input: unknown) {
-    const data = UserCreateSchema.parse(input);
+async create(input: unknown) {
+  const data = UserCreateSchema.parse(input);
 
-    const existing = await userRepo.findByEmail(data.email);
-    if (existing) {
-      const err = new Error("ya existe un usuario con ese email");
-      (err as any).statusCode = 409;
-      throw err;
-    }
-    const dto: UserCreateInput = {
-      ...data,
-      isAdmin: data.isAdmin ?? false,
-    };
-
-    const user = await sequelize.transaction(async (tx) => {
-      userRepo.create(dto, tx);
-    });
-    return toUserInfoDto(user);
+  const existing = await userRepo.findByEmail(data.email);
+  if (existing) {
+    const err = new Error("ya existe un usuario con ese email");
+    (err as any).statusCode = 409;
+    throw err;
   }
 
+  const dto: UserCreateInput = {
+    name: data.name,
+    email: data.email,
+    password: data.password,
+    isAdmin: data.isAdmin ?? false,
+  };
+
+  const user = await sequelize.transaction(async (tx) => {
+    return userRepo.create(dto, tx);
+  });
+
+  return toUserInfoDto(user);
+}
   async getByIdOrThrow(id: number) {
     const found = await userRepo.findById(id);
     if (!found) {

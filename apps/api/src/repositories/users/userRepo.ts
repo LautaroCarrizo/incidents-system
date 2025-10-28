@@ -6,7 +6,6 @@ import {
 } from "../../models/users/user.js";
 import type { UserQueryInput } from "../../schemas/user/userSchema.js";
 
-
 class UserRepo {
   async findAll(query: UserQueryInput, tx?: Transaction | null) {
     const { page, pageSize, search, sort, isAdmin } = query;
@@ -40,8 +39,20 @@ class UserRepo {
 
     return { rows, count, page, pageSize };
   }
-  async create(data: Omit<UserCreationAttributes, "id">, tx?: Transaction | null) {
-    return UserModel.create(data, tx ? { transaction: tx } : undefined);
+  async create(
+    data: { name: string; email: string; password: string; isAdmin?: boolean },
+    tx?: Transaction | null
+  ) {
+    return UserModel.create(
+      {
+        id: undefined,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        isAdmin: data.isAdmin ?? false,
+      },
+      tx ? { transaction: tx } : undefined
+    );
   }
 
   async findById(id: number, tx?: Transaction | null) {
