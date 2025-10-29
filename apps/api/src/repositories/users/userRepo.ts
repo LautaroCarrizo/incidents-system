@@ -4,22 +4,15 @@ import {
   type UserCreationAttributes,
   type UserAttributes,
 } from "../../models/users/user.js";
+import type { UserQueryInput } from "../../schemas/user/userSchema.js";
 
 class UserRepo {
-  async findAll(
-    params: {
-      page: number;
-      pageSize: number;
-      search?: string | undefined;
-      sort?: string | undefined;
-      isAdmin?: boolean;
-    },
-    tx?: Transaction | null
-  ) {
-    const { page, pageSize, search, sort, isAdmin } = params;
+  async findAll(query: UserQueryInput, tx?: Transaction | null) {
+    const { page, pageSize, search, sort, isAdmin } = query;
 
     const where: any = {};
     if (typeof isAdmin === "boolean") where.isAdmin = isAdmin;
+
     if (search) {
       where[Op.or] = [
         { name: { [Op.like]: `%${search}%` } },
@@ -34,19 +27,32 @@ class UserRepo {
       order = [[field, dir]];
     }
 
+    const offset = (page - 1) * pageSize;
+
     const { rows, count } = await UserModel.findAndCountAll({
       where,
       limit: pageSize,
-      offset: (page - 1) * pageSize,
+      offset,
       order,
       ...(tx ? { transaction: tx } : {}),
     });
 
     return { rows, count, page, pageSize };
   }
-
-  async create(data: UserCreationAttributes, tx?: Transaction | null) {
-    return UserModel.create(data, tx ? { transaction: tx } : undefined);
+  async create(
+    data: { name: string; email: string; password: string; isAdmin?: boolean },
+    tx?: Transaction | null
+  ) {
+    return UserModel.create(
+      {
+        id: undefined,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        isAdmin: data.isAdmin ?? false,
+      },
+      tx ? { transaction: tx } : undefined
+    );
   }
 
   async findById(id: number, tx?: Transaction | null) {
