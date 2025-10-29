@@ -106,6 +106,16 @@ class AgentService {
     return toAgentInfoDto(updated);
   }
 
+  async getByIdOrThrow(id: number) {
+    const found = await agentRepo.findById(id);
+    if (!found) {
+      const err = new Error("usuario no encontrado por id");
+      (err as any).statusCode = 404;
+      throw err;
+    }
+    return toAgentInfoDto(found);
+  }
+
   async delete(id: number, actor: AuthContext) {
     const decision = canDeleteAgent(actor);
     if (!decision.allowed) {

@@ -7,6 +7,7 @@ import { healthRouter } from "./config/health.js";
 import { logger } from "./config/logger.js";
 import { incidentRouter } from "./routes/incidents/incidentsRoutes.js";
 import { userRouter } from "./routes/users/userRoute.js";
+import { agentRouter } from "./routes/agents/agentRoute.js";
 async function bootstrap() {
   const app = express();
 
@@ -14,57 +15,62 @@ async function bootstrap() {
   applyAppMiddlewares(app);
 
   // 2) Rutas de salud (liveness/readiness)
-  app.use('/', healthRouter);
-
+  app.use("/", healthRouter);
 
   app.use("/api/v1/incidents", incidentRouter);
-  app.use("/api/v1/users", userRouter)
+  app.use("/api/v1/users", userRouter);
+  app.use("/api/v1/agents", agentRouter);
   // 3) Conectar dependencias críticas ANTES de aceptar tráfico
   await connectDB();
 
   // 4) Levantar servidor
   const server = app.listen(env.PORT, () => {
-    logger.info(`🚀 API escuchando en puerto ${env.PORT} (NODE_ENV=${env.NODE_ENV})`);
+    logger.info(
+      `🚀 API escuchando en puerto ${env.PORT} (NODE_ENV=${env.NODE_ENV})`
+    );
   });
 
   // 5) Manejo de errores “globales” (fallos no atrapados)
-  process.on('unhandledRejection', (reason) => {
-    logger.error({ reason }, '🧨 Unhandled Promise Rejection');
+  process.on("unhandledRejection", (reason) => {
+    logger.error({ reason }, "🧨 Unhandled Promise Rejection");
   });
 
-  process.on('uncaughtException', (err) => {
-    logger.error({ err }, '🧨 Uncaught Exception');
+  process.on("uncaughtException", (err) => {
+    logger.error({ err }, "🧨 Uncaught Exception");
   });
 
   // 6) Apagado limpio (graceful shutdown)
   const shutdown = (signal: NodeJS.Signals) => {
-    logger.warn({ signal }, '🛑 Señal recibida. Iniciando apagado limpio…');
+    logger.warn({ signal }, "🛑 Señal recibida. Iniciando apagado limpio…");
 
     // Evitar aceptar nuevas conexiones
     server.close(async () => {
       try {
         await disconnectDB();
-        logger.info('✅ Recursos liberados. Saliendo…');
+        logger.info("✅ Recursos liberados. Saliendo…");
         process.exit(0);
       } catch (err) {
-        logger.error({ err }, '❌ Error cerrando recursos. Saliendo con código 1.');
+        logger.error(
+          { err },
+          "❌ Error cerrando recursos. Saliendo con código 1."
+        );
         process.exit(1);
       }
     });
 
     // Falla segura si algo cuelga
     setTimeout(() => {
-      logger.error('⏳ Timeout de shutdown alcanzado. Forzando salida.');
+      logger.error("⏳ Timeout de shutdown alcanzado. Forzando salida.");
       process.exit(1);
     }, 10_000).unref();
   };
 
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
 
 // Arranque de la app
 bootstrap().catch((err) => {
-  logger.error({ err }, '❌ Error al iniciar la app');
+  logger.error({ err }, "❌ Error al iniciar la app");
   process.exit(1);
 });
