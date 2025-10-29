@@ -5,8 +5,7 @@ import type {
   IncidentUpdateInput,
 } from "../../schemas/incidents/incidentsSchema.js";
 import { incidentService } from "../../services/incidents/incidentsService.js";
-
-type AuthContext = { userId?: number; role?: "ADMIN" | "USER" };
+import type { AuthContext } from "../../auth-admin/context.js";
 
 export async function list(
   req: Request<{}, any, any, IncidentQueryInput>,
@@ -24,6 +23,12 @@ export async function create(
   req: Request<{}, any, IncidentCreateInput>,
   res: Response
 ) {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "Falta token" },
+    });
+  }
   const dto = await incidentService.create(req.body, req.user?.id);
   return res.status(201).json({ success: true, data: dto });
 }
@@ -34,26 +39,41 @@ export async function getById(req: Request<{ id: string }>, res: Response) {
   return res.json({ success: true, data: dto });
 }
 
-
 export async function update(
   req: Request<{ id: string }, any, IncidentUpdateInput>,
   res: Response
 ) {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "Falta token" },
+    });
+  }
+
   const id = Number(req.params.id);
-  const ctx = {
-    userId: req.user?.id,
-    role: req.user?.isAdmin ? "ADMIN" : "USER",
-  } as AuthContext;
-  const dto = await incidentService.update(id, req.body, ctx);
+  const actor: AuthContext = {
+    userId: req.user.id,
+    role: req.user.isAdmin ? "ADMIN" : "USER",
+  };
+
+  const dto = await incidentService.update(id, req.body, actor);
   return res.json({ success: true, data: dto });
 }
 
 export async function remove(req: Request<{ id: string }>, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "Falta token" },
+    });
+  }
+
   const id = Number(req.params.id);
-  const ctx = {
-    userId: req.user?.id,
-    role: req.user?.isAdmin ? "ADMIN" : "USER",
-  } as AuthContext;
-  await incidentService.softDelete(id, ctx);
+  const actor: AuthContext = {
+    userId: req.user.id,
+    role: req.user.isAdmin ? "ADMIN" : "USER",
+  };
+
+  await incidentService.delete(id, actor);
   return res.json({ success: true, data: { ok: true } });
 }

@@ -17,7 +17,7 @@ import {
 } from "../../auth-admin/rules/incidentesRules.js";
 import type { AuthContext } from "../../auth-admin/context.js";
 
-type Ctx = { userId?: number; role?: "ADMIN" | "USER" };
+
 class IncidentService {
   async paginate(query: IncidentQueryInput) {
     const { rows, count } = await incidentRepo.findAll(query);
