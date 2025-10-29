@@ -11,6 +11,12 @@ import {
   toIncidentListDto,
 } from "../../dtos/incident/incidentDto.js";
 import { sequelize } from "../../config/db/sequelizeConn.js";
+import {
+  canDeleteIncident,
+  canUpdateIncident,
+} from "../../auth-admin/rules/incidentesRules.js";
+import type { AuthContext } from "../../auth-admin/context.js";
+
 type Ctx = { userId?: number; role?: "ADMIN" | "USER" };
 class IncidentService {
   async paginate(query: IncidentQueryInput) {
@@ -59,7 +65,7 @@ class IncidentService {
     return toIncidentInfoDto(found);
   }
 
-  async update(id: number, input: IncidentUpdateInput, ctx?: Ctx) {
+  async update(id: number, input: IncidentUpdateInput, actor: AuthContext) {
     const data = IncidentUpdateSchema.parse(input);
 
     const updated = await sequelize.transaction(async (tx) => {
@@ -70,60 +76,56 @@ class IncidentService {
         throw err;
       }
 
-      const isOwner =
-        current.reporterId != null && ctx?.userId === current.reporterId;
-      const isAdmin = ctx?.role === "ADMIN";
-      if (!isOwner && !isAdmin) {
+      const decision = canUpdateIncident(actor, {
+        reporterId: current.reporterId,
+      });
+      if (!decision.allowed) {
         const err = new Error("No podés editar este incidente");
         (err as any).statusCode = 403;
         throw err;
       }
 
-      const patchOwner = {
-        message: data.message ?? current.message,
-        latitude: data.latitude ?? current.latitude,
-        longitude: data.longitude ?? current.longitude,
-        address: data.address ?? current.address,
+      const proposedPatch = {
+        ...(data.message !== undefined ? { message: data.message } : {}),
+        ...(data.latitude !== undefined ? { latitude: data.latitude } : {}),
+        ...(data.longitude !== undefined ? { longitude: data.longitude } : {}),
+        ...(data.address !== undefined ? { address: data.address } : {}),
+        ...(data.typeIncident !== undefined
+          ? { typeIncident: data.typeIncident }
+          : {}),
+        ...(data.status !== undefined ? { status: data.status } : {}),
       };
-      const patchAdmin = {
-        ...patchOwner,
-        typeIncident: data.typeIncident ?? current.typeIncident,
-        status: data.status ?? current.status,
-      };
-      const patch = isAdmin ? patchAdmin : patchOwner;
+
+      const patch = decision.mask
+        ? decision.mask(proposedPatch)
+        : proposedPatch;
+
       const saved = await incidentRepo.update(id, patch, tx);
       if (!saved) {
         const err = new Error("Incidente no encontrado al actualizar");
         (err as any).statusCode = 404;
         throw err;
       }
-
       return saved;
     });
 
     return toIncidentInfoDto(updated);
   }
-
-  async softDelete(id: number, ctx?: Ctx) {
+  async delete(id: number, actor: AuthContext) {
     const ok = await sequelize.transaction(async (tx) => {
       const current = await incidentRepo.findById(id, tx);
-      if (!current) {
-        const err = new Error("Incidente no encontrado");
-        (err as any).statusCode = 404;
-        throw err;
-      }
+      if (!current) return null;
+      const decision = canDeleteIncident(actor, {
+        userId: current.reporterId ?? 0,
+      });
 
-      const isOwner =
-        current.reporterId != null && ctx?.userId === current.reporterId;
-      const isAdmin = ctx?.role === "ADMIN";
-      if (!isOwner && !isAdmin) {
-        const err = new Error("No podés eliminar este incidente");
+      if (!decision.allowed) {
+        const err = new Error(decision.reason || "FORBIDDEN");
         (err as any).statusCode = 403;
         throw err;
       }
 
-      const deleted = await incidentRepo.delete(id, tx);
-      return deleted;
+      return incidentRepo.delete(id, tx);
     });
 
     if (!ok) {
@@ -133,5 +135,4 @@ class IncidentService {
     }
   }
 }
-
 export const incidentService = new IncidentService();
