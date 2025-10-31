@@ -4,8 +4,13 @@ import type { AssignmentStatus } from "../../enums/enumsWithZod.js";
 type AssignmentPatch = {
   status?: AssignmentStatus;
   notes?: string | null;
-  agentId?: number | null;
+  agentId?: number;
   incidentId?: number;
+  slaDueAt?: Date | null;
+  acceptedAt?: Date | null;
+  startedAt?: Date | null;
+  resolvedAt?: Date | null;
+  closedAt?: Date | null;
 };
 
 export function canCreateAssignment(
@@ -24,28 +29,32 @@ export function canCreateAssignment(
 
 export function canUpdateAssignment(
   actor: AuthContext,
-  ctx: { agentOwnerUserId?: number }
+  ctx: { agentOwnerUserId?: number | null }
 ): {
   allowed: boolean;
   mask?: (p: AssignmentPatch) => AssignmentPatch;
   reason?: string;
 } {
   const isAdmin = actor.role === "ADMIN";
-  const isAgentOwner = ctx.agentOwnerUserId === actor.userId;
+  const isAgentOwner =
+    ctx.agentOwnerUserId != null && ctx.agentOwnerUserId === actor.userId;
 
-  if (isAdmin) return { allowed: true, mask: (p) => p };
+  if (isAdmin) {
+    return { allowed: true, mask: (p) => p };
+  }
 
   if (isAgentOwner) {
     return {
       allowed: true,
-      mask: (p) => {
-        const out: AssignmentPatch = {};
-        if (p.status !== undefined) out.status = p.status;
-        if (p.notes !== undefined) out.notes = p.notes;
-        if (p.agentId !== undefined) out.agentId = p.agentId;
-        if (p.incidentId !== undefined) out.incidentId = p.incidentId;
-        return out;
-      },
+      mask: (p) => ({
+        ...(p.status !== undefined ? { status: p.status } : {}),
+        ...(p.notes !== undefined ? { notes: p.notes } : {}),
+        ...(p.slaDueAt !== undefined ? { slaDueAt: p.slaDueAt } : {}),
+        ...(p.acceptedAt !== undefined ? { acceptedAt: p.acceptedAt } : {}),
+        ...(p.startedAt !== undefined ? { startedAt: p.startedAt } : {}),
+        ...(p.resolvedAt !== undefined ? { resolvedAt: p.resolvedAt } : {}),
+        ...(p.closedAt !== undefined ? { closedAt: p.closedAt } : {}),
+      }),
     };
   }
 
@@ -53,7 +62,7 @@ export function canUpdateAssignment(
 }
 export function canDeleteAssignment(
   actor: AuthContext,
-  ctx: { agentOwnerUserId?: number }
+  ctx: { agentOwnerUserId?: number | null}
 ): { allowed: boolean; reason?: string } {
   const isAdmin = actor.role === "ADMIN";
   const isAgentOwner =
