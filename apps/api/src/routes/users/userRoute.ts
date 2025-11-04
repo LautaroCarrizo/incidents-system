@@ -11,7 +11,7 @@ import * as ctrl from "../../controllers/users/userController.js";
 
 export const userRouter: Router = Router();
 
-userRouter.use(authGuard());
+//userRouter.use(authGuard());
 
 userRouter.get(
   "/",
@@ -27,7 +27,7 @@ userRouter.post(
 
 userRouter.get("/:id", asyncHandler(ctrl.getById));
 
-userRouter.get("/:email", asyncHandler(ctrl.getByEmail));
+userRouter.get("/email/:email", asyncHandler(ctrl.getByEmail));
 
 userRouter.patch(
   "/:id",
