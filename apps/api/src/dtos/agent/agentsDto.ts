@@ -1,4 +1,4 @@
-import { AgentStatus } from "../../enums/agentStatus.js";
+import { type AgentStatus } from "../../enums/enumsWithZod.js";
 
 export interface AgentInfoDto {
   id: number;
