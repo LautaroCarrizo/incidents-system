@@ -13,7 +13,7 @@ import * as ctrl from "../../controllers/assignment/assignmentController.js";
 
 export const assignmentRouter: Router = Router();
 
-assignmentRouter.use(authGuard());
+//assignmentRouter.use(authGuard());
 
 assignmentRouter.get(
   "/",
@@ -28,7 +28,7 @@ assignmentRouter.post(
 );
 
 assignmentRouter.get("/:id", asyncHandler(ctrl.getById));
-assignmentRouter.get("/:incidentId", asyncHandler(ctrl.getByIncidentId));
+assignmentRouter.get("/incident/:id", asyncHandler(ctrl.getByIncidentId));
 
 assignmentRouter.patch(
   "/:id",

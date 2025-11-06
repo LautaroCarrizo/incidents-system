@@ -23,7 +23,7 @@ class AssignmentService {
   async paginate(query: AssignmentQueryInput) {
     const { rows, count } = await assignmentRepo.findAll(query);
     return {
-      items: toAssignmentListDto(rows),
+      items: rows.map(toAssignmentListDto),
       total: count,
       page: query.page,
       pageSize: query.pageSize,
@@ -107,7 +107,6 @@ class AssignmentService {
         ...(data.closedAt !== undefined ? { closedAt: data.closedAt } : {}),
       };
 
-      // Admin: puede tocar también “duros” si vinieron
       const proposedAdminPatch = {
         ...proposedOwnerPatch,
         ...(data.agentId !== undefined ? { agentId: data.agentId } : {}),

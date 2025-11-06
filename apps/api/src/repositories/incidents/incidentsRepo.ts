@@ -9,33 +9,29 @@ import type { IncidentQueryInput } from "../../schemas/incidents/incidentsSchema
 
 
 class IncidentRepo {
-  async findAll(query: IncidentQueryInput, tx?: Transaction | null) {
-    const { page, pageSize, search, status, typeIncident, sort } = query;
+public async findAll(query: IncidentQueryInput, tx?: Transaction | null) {
+  const { page = 1, pageSize = 20, search, status, typeIncident } = query;
 
-    const where: any = {};
-    if (status) where.status = status;
-    if (typeIncident) where.typeIncident = typeIncident;
-    if (search) where.message = { [Op.like]: `%${search}%` };
+  // paginación segura
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+  const safeSize = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 20;
+  const offset = (safePage - 1) * safeSize;
 
-    let order: any = [["createdAt", "DESC"]];
-    if (sort) {
-      const dir = sort.startsWith("-") ? "DESC" : "ASC";
-      const col = sort.replace(/^[-+]/, "");
-      order = [[col, dir]];
-    }
+  const where: any = {};
+  if (status) where.status = status;
+  if (typeIncident) where.typeIncident = typeIncident;
+  if (search) where.message = { [Op.like]: `%${search}%` };
 
-    const offset = (page - 1) * pageSize;
+  const { rows, count } = await IncidentModel.findAndCountAll({
+    where,
+    order: [["createdAt", "DESC"], ["id", "DESC"]],
+    limit: safeSize,
+    offset,
+    ...(tx ? { transaction: tx } : {}),
+  });
 
-    const { rows, count } = await IncidentModel.findAndCountAll({
-      where,
-      order,
-      limit: pageSize,
-      offset,
-      ...(tx ? { transaction: tx } : {}),
-    });
-
-    return { rows, count };
-  }
+  return { rows, count, page: safePage, pageSize: safeSize };
+}
 
   async findById(id: number, tx?: Transaction | null) {
     return IncidentModel.findByPk(id, tx ? { transaction: tx } : undefined);

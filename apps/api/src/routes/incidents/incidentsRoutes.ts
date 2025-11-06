@@ -15,7 +15,7 @@ export const incidentRouter: Router = Router();
 
 // 🔒 Descomenta esta línea cuando tengas JWT activo.
 // Si querés probar abierto, comentala.
- incidentRouter.use(authGuard());
+ //incidentRouter.use(authGuard());
 
 // GET /api/v1/incidents?status=&typeIncident=&search=&page=&pageSize=&sort=
 incidentRouter.get(

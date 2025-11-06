@@ -1,4 +1,3 @@
-
 import { Op, type Transaction } from "sequelize";
 import {
   AgentModel,
@@ -7,9 +6,19 @@ import {
 import type { AgentQueryInput } from "../../schemas/agents/agentsSchema.js";
 import type { AgentTypes, AgentStatus } from "../../enums/enumsWithZod.js";
 export class AgentRepo {
-  async findAll(query: AgentQueryInput, tx?: Transaction | null) {
-    const { page, pageSize, search, status, agentType, jurisdiction, sort } =
-      query;
+  public async findAll(query: AgentQueryInput, tx?: Transaction | null) {
+    const {
+      page = 1,
+      pageSize = 20,
+      search,
+      status,
+      agentType,
+      jurisdiction,
+    } = query;
+
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+    const safeSize = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 20;
+    const offset = (safePage - 1) * safeSize;
 
     const where: any = {};
     if (status) where.status = status;
@@ -17,24 +26,15 @@ export class AgentRepo {
     if (jurisdiction) where.jurisdiction = { [Op.like]: `%${jurisdiction}%` };
     if (search) where.agentName = { [Op.like]: `%${search}%` };
 
-    let order: any = [["id", "ASC"]];
-    if (sort) {
-      const dir = sort.startsWith("-") ? "DESC" : "ASC";
-      const field = sort.replace(/^[+-]/, "");
-      order = [[field, dir]];
-    }
-
-    const offset = (page - 1) * pageSize;
-
     const { rows, count } = await AgentModel.findAndCountAll({
       where,
-      order,
-      limit: pageSize,
+      order: [["id", "ASC"]],
+      limit: safeSize,
       offset,
       ...(tx ? { transaction: tx } : {}),
     });
 
-    return { rows, count, page, pageSize };
+    return { rows, count, page: safePage, pageSize: safeSize };
   }
 
   async findById(id: number, tx?: Transaction | null) {
@@ -87,7 +87,13 @@ export class AgentRepo {
     patch: Partial<
       Pick<
         AgentAttributes,
-        "agentName" | "agentType" | "status" | "isOnCall" | "capacity" | "jurisdiction" | "autoAccept"
+        | "agentName"
+        | "agentType"
+        | "status"
+        | "isOnCall"
+        | "capacity"
+        | "jurisdiction"
+        | "autoAccept"
       >
     >,
     tx?: Transaction | null

@@ -18,7 +18,7 @@ class AgentService {
   async paginate(query: AgentQueryInput) {
     const { rows, count, page, pageSize } = await agentRepo.findAll(query);
     return {
-      items: toAgentListDto ? toAgentListDto(rows) : rows,
+      items: rows.map(toAgentListDto),
       total: count,
       page,
       pageSize,

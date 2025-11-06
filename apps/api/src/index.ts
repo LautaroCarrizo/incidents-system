@@ -9,6 +9,8 @@ import { incidentRouter } from "./routes/incidents/incidentsRoutes.js";
 import { userRouter } from "./routes/users/userRoute.js";
 import { agentRouter } from "./routes/agents/agentRoute.js";
 import { assignmentRouter } from "./routes/assignment/assignmentRoutes.js";
+import { errorHandler } from "./middlewares/handlers/errorHandler.js";
+import { notFoundHandler } from "./middlewares/handlers/notFuoundHandler.js";
 async function bootstrap() {
   const app = express();
 
@@ -21,7 +23,10 @@ async function bootstrap() {
   app.use("/api/v1/incidents", incidentRouter);
   app.use("/api/v1/users", userRouter);
   app.use("/api/v1/agents", agentRouter);
-    app.use("/api/v1/assignment", assignmentRouter);
+  app.use("/api/v1/assignments", assignmentRouter);
+
+  app.use(notFoundHandler());
+  app.use(errorHandler());
   // 3) Conectar dependencias críticas ANTES de aceptar tráfico
   await connectDB();
 
