@@ -11,7 +11,7 @@ import * as ctrl from "../../controllers/agent/agentController.js";
 
 export const agentRouter: Router = Router();
 
-agentRouter.use(authGuard());
+//agentRouter.use(authGuard());
 
 agentRouter.get(
   "/",

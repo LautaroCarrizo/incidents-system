@@ -23,12 +23,6 @@ export async function create(
   req: Request<{}, any, IncidentCreateInput>,
   res: Response
 ) {
-  if (!req.user) {
-    return res.status(401).json({
-      success: false,
-      error: { code: "UNAUTHORIZED", message: "Falta token" },
-    });
-  }
   const dto = await incidentService.create(req.body, req.user?.id);
   return res.status(201).json({ success: true, data: dto });
 }
@@ -43,20 +37,10 @@ export async function update(
   req: Request<{ id: string }, any, IncidentUpdateInput>,
   res: Response
 ) {
-  if (!req.user) {
-    return res.status(401).json({
-      success: false,
-      error: { code: "UNAUTHORIZED", message: "Falta token" },
-    });
-  }
 
   const id = Number(req.params.id);
-  const actor: AuthContext = {
-    userId: req.user.id,
-    role: req.user.isAdmin ? "ADMIN" : "USER",
-  };
 
-  const dto = await incidentService.update(id, req.body, actor);
+  const dto = await incidentService.update(id, req.body, req.user);
   return res.json({ success: true, data: dto });
 }
 

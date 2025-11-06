@@ -27,11 +27,9 @@ export async function getById(req: Request<{ id: string }>, res: Response) {
   const dto = await userService.getByIdOrThrow(id);
   return res.json({ success: true, data: dto });
 }
-export async function getByEmail(
-  req: Request<{}, any, UserEmailInput>,
-  res: Response
-) {
-  const dto = await userService.getByEmailOrThrow(req.body.email);
+export async function getByEmail(req: Request, res: Response) {
+  const email = String(req.params.email);
+  const dto = await userService.getByEmailOrThrow(email);
   return res.json({ success: true, data: dto });
 }
 export async function update(

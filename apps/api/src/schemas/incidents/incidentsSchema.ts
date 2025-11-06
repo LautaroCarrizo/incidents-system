@@ -16,7 +16,7 @@ export const IncidentCreateSchema = z.object({
     .transform(v => v ?? null),
   address: z.string().max(255).optional().nullable().transform(v => v ?? null),
   reporterId: z.number().int().positive().optional().nullable()
-});
+}).strip();
 export type IncidentCreateInput = z.infer<typeof IncidentCreateSchema>;
 
 export const IncidentUpdateSchema = z.object({

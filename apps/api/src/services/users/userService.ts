@@ -13,7 +13,7 @@ class UserService {
   async userList(query: UserQueryInput) {
     const { rows, count } = await userRepo.findAll(query);
     return {
-      items: toUserListDto(rows),
+      items: rows.map(toUserListDto),
       total: count,
       page: query.page,
       pageSize: query.pageSize,

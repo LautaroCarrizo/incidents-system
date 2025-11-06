@@ -8,32 +8,28 @@ import type {
   AssignmentQueryInput,
   AssignmentUpdateInput,
 } from "../../schemas/assignments/assignmentsSchema.js";
-import type { AssignmentStatus } from "../../enums/enumsWithZod.js";
 
 class AssignmentRepo {
-  async findAll(query: AssignmentQueryInput, tx?: Transaction | null) {
-    const { page, pageSize, search, status, sort } = query;
+  public async findAll(query: AssignmentQueryInput, tx?: Transaction | null) {
+    const { page = 1, pageSize = 20, search, status } = query;
+
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+    const safeSize = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 20;
+    const offset = (safePage - 1) * safeSize;
 
     const where: any = {};
     if (status) where.status = status;
     if (search) where.message = { [Op.like]: `%${search}%` };
 
-    let order: any = [["createdAt", "DESC"]];
-    if (sort) {
-      const dir = sort.startsWith("-") ? "DESC" : "ASC";
-      const col = sort.replace(/^[-+]/, "");
-      order = [[col, dir]];
-    }
-    const offset = (page - 1) * pageSize;
-
     const { rows, count } = await AssignmentModel.findAndCountAll({
       where,
-      order,
-      limit: pageSize,
+      order: [["createdAt", "DESC"]],
+      limit: safeSize,
       offset,
       ...(tx ? { transaction: tx } : {}),
     });
-    return { rows, count, page, pageSize };
+
+    return { rows, count, page: safePage, pageSize: safeSize };
   }
   async create(data: AssignmentCreateInput, tx?: Transaction | null) {
     const payload = {
@@ -62,9 +58,7 @@ class AssignmentRepo {
 
   async update(
     id: number,
-    patch: Partial<
-      Pick<AssignmentAttributes, "status" | "notes" | "slaDueAt" >
-    >,
+    patch: Partial<Pick<AssignmentAttributes, "status" | "notes" | "slaDueAt">>,
     tx?: Transaction | null
   ) {
     const assignment = await AssignmentModel.findByPk(

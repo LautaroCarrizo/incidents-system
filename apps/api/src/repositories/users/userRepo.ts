@@ -20,24 +20,29 @@ class UserRepo {
       ];
     }
 
+    const SORTABLE = new Set(["id", "email", "name", "createdAt"]);
     let order: any = [["id", "ASC"]];
     if (sort) {
       const dir = sort.startsWith("-") ? "DESC" : "ASC";
       const field = sort.replace(/^[+-]/, "");
-      order = [[field, dir]];
+      if (SORTABLE.has(field)) {
+        order = [[field, dir]];
+      }
     }
 
-    const offset = (page - 1) * pageSize;
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+    const safeSize = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 20;
+    const offset = (safePage - 1) * safeSize;
 
     const { rows, count } = await UserModel.findAndCountAll({
       where,
-      limit: pageSize,
+      limit: safeSize,
       offset,
       order,
       ...(tx ? { transaction: tx } : {}),
     });
 
-    return { rows, count, page, pageSize };
+    return { rows, count, page: safePage, pageSize: safeSize };
   }
   async create(
     data: { name: string; email: string; password: string; isAdmin?: boolean },

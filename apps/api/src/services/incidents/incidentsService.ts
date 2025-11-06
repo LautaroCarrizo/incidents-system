@@ -17,12 +17,11 @@ import {
 } from "../../auth-admin/rules/incidentesRules.js";
 import type { AuthContext } from "../../auth-admin/context.js";
 
-
 class IncidentService {
   async paginate(query: IncidentQueryInput) {
     const { rows, count } = await incidentRepo.findAll(query);
     return {
-      items: toIncidentListDto(rows),
+      items: rows.map(toIncidentListDto),
       total: count,
       page: query.page,
       pageSize: query.pageSize,
@@ -65,8 +64,22 @@ class IncidentService {
     return toIncidentInfoDto(found);
   }
 
-  async update(id: number, input: IncidentUpdateInput, actor: AuthContext) {
+  async update(
+    id: number,
+    input: IncidentUpdateInput,
+    user: { id: number; isAdmin: boolean } | undefined
+  ) {
+    console.log(user, "USEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    if (!user) {
+      const err = new Error("Falta token");
+      (err as any).statusCode = 401;
+      throw err;
+    }
     const data = IncidentUpdateSchema.parse(input);
+    const actor: AuthContext = {
+      userId: user.id,
+      role: user.isAdmin ? "ADMIN" : "USER",
+    };
 
     const updated = await sequelize.transaction(async (tx) => {
       const current = await incidentRepo.findById(id, tx);
