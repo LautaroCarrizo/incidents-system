@@ -7,7 +7,7 @@ export async function connectDB(): Promise<void> {
     await sequelize.authenticate();
     logger.info("✅ Conectado a MySQL");
     if (env.NODE_ENV !== "production") {
-      await sequelize.sync({alter: true});
+      await sequelize.sync({force: true});
       logger.info("🛠️  Sequelize sync (alter) completado");
     }
   } catch (err) {

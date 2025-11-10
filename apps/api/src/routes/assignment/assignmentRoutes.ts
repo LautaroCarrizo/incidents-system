@@ -13,7 +13,7 @@ import * as ctrl from "../../controllers/assignment/assignmentController.js";
 
 export const assignmentRouter: Router = Router();
 
-//assignmentRouter.use(authGuard());
+assignmentRouter.use(authGuard());
 
 assignmentRouter.get(
   "/",

@@ -1,9 +1,8 @@
-
 import type { Request, Response, NextFunction } from "express";
 import type { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-secret";
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "dev-secret";
 
 export function authGuard() {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +18,7 @@ export function authGuard() {
         });
       }
 
-      const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET); // string | JwtPayload
+      const decoded = jwt.verify(token, JWT_ACCESS_SECRET); // string | JwtPayload
       if (typeof decoded === "string") {
         return res.status(401).json({
           success: false,

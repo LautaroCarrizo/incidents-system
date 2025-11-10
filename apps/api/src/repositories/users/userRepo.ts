@@ -92,6 +92,17 @@ class UserRepo {
     await user.update(patch, tx ? { transaction: tx } : undefined);
     return user;
   }
+  async updatePassword(
+    id: number,
+    hashed: string,
+    tx?: Transaction | null
+  ): Promise<boolean> {
+    const [count] = await UserModel.update(
+      { password: hashed },
+      { where: { id }, ...(tx ? { transaction: tx } : {}) }
+    );
+    return count === 1;
+  }
 
   async deleteHard(id: number, tx?: Transaction | null) {
     const n = await UserModel.destroy({

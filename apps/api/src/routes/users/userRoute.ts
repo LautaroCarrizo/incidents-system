@@ -8,10 +8,10 @@ import {
   UserUpdateSchema,
 } from "../../schemas/user/userSchema.js";
 import * as ctrl from "../../controllers/users/userController.js";
-
+import { ChangePasswordSchema } from "../../schemas/auth/authSchema.js";
 export const userRouter: Router = Router();
 
-//userRouter.use(authGuard());
+userRouter.use(authGuard());
 
 userRouter.get(
   "/",
@@ -34,5 +34,9 @@ userRouter.patch(
   validate(UserUpdateSchema, "body"),
   asyncHandler(ctrl.update)
 );
-
+userRouter.post(
+    "/me/change-password",
+  validate(ChangePasswordSchema, "body"),
+  asyncHandler(ctrl.changePassword)
+);
 userRouter.delete("/:id", asyncHandler(ctrl.remove));
