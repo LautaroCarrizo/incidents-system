@@ -11,6 +11,7 @@ import { agentRouter } from "./routes/agents/agentRoute.js";
 import { assignmentRouter } from "./routes/assignment/assignmentRoutes.js";
 import { errorHandler } from "./middlewares/handlers/errorHandler.js";
 import { notFoundHandler } from "./middlewares/handlers/notFuoundHandler.js";
+import { authRouter } from "./routes/auth/authRoutes.js";
 async function bootstrap() {
   const app = express();
 
@@ -24,7 +25,7 @@ async function bootstrap() {
   app.use("/api/v1/users", userRouter);
   app.use("/api/v1/agents", agentRouter);
   app.use("/api/v1/assignments", assignmentRouter);
-
+  app.use("/api/v1/auth", authRouter);
   app.use(notFoundHandler());
   app.use(errorHandler());
   // 3) Conectar dependencias críticas ANTES de aceptar tráfico
