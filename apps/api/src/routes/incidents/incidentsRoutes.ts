@@ -8,11 +8,16 @@ import {
   IncidentUpdateSchema,
   IncidentQuerySchema,
 } from "../../schemas/incidents/incidentsSchema.js";
-
+import { IncidentMapQuerySchema } from "../../schemas/map/mapZod.js";
 import * as ctrl from "../../controllers/incidents/incidentsController.js";
-
+import * as mapCtrl from "../../controllers/map/mapController.js";
 export const incidentRouter: Router = Router();
 
+incidentRouter.get(
+  "/geo",
+  validate(IncidentMapQuerySchema, "query"),
+  asyncHandler(mapCtrl.listGeo)
+);
 incidentRouter.use(authGuard());
 
 // GET /api/v1/incidents?status=&typeIncident=&search=&page=&pageSize=&sort=
@@ -21,7 +26,6 @@ incidentRouter.get(
   validate(IncidentQuerySchema, "query"),
   asyncHandler(ctrl.list)
 );
-
 // POST /api/v1/incidents
 incidentRouter.post(
   "/",
