@@ -8,7 +8,7 @@ export const IncidentsPage = () => {
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
-        <p className="text-gray-600">Incidents list will appear here</p>
+        <p className="text-gray-600">Incidents Page (protected)</p>
       </div>
     </div>
   );
