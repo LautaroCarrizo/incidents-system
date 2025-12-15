@@ -8,7 +8,7 @@ interface NavItem {
 }
 
 const allNavItems: NavItem[] = [
-  { label: 'Mapa', path: '/app/map' },
+  { label: 'Home', path: '/app/map' },
   { label: 'Incidentes', path: '/app/incidents' },
   { label: 'Assignments', path: '/app/assignments', adminOnly: true },
   { label: 'Agents', path: '/app/agents', adminOnly: true },

@@ -26,6 +26,9 @@ export interface IncidentListItem {
   id: number;
   typeIncident: string;
   status: string;
+  message: string;
+  latitude: number | null;
+  longitude: number | null;
   createdAt: string;
 }
 
@@ -51,6 +54,27 @@ export interface IncidentListQuery {
   search?: string;
 }
 
+export interface IncidentCreateInput {
+  typeIncident: 'ROBBERY' | 'FIRE' | 'ACCIDENT' | 'EMERGENCY';
+  message: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
+}
+
+export interface IncidentInfo {
+  id: number;
+  typeIncident: string;
+  message: string;
+  latitude: number | null;
+  longitude: number | null;
+  address: string | null;
+  reporterId: number | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const incidentsApi = {
   getGeo: async (query: IncidentGeoQuery = {}): Promise<ApiResponse<IncidentGeoCollection>> => {
     const params = new URLSearchParams();
@@ -73,24 +97,35 @@ export const incidentsApi = {
     if (query.typeIncident) params.append('typeIncident', query.typeIncident);
     if (query.search) params.append('search', query.search);
 
+    // El backend devuelve: { success: true, data: [...items], meta: {...} }
+    // El interceptor de httpClient retorna response.data directamente, que ya es { success, data, meta }
     const response = await apiRequest<{ data: IncidentListItem[]; meta: { page: number; pageSize: number; total: number } }>({
       method: 'GET',
       url: `/api/v1/incidents?${params.toString()}`,
-    });
+    }) as any;
 
-    // Transformar la respuesta del backend al formato esperado
+    // Transformar la respuesta al formato esperado
     if (response.success) {
       return {
         success: true,
         data: {
-          items: response.data.data,
-          total: response.data.meta.total,
-          page: response.data.meta.page,
-          pageSize: response.data.meta.pageSize,
+          items: Array.isArray(response.data) ? response.data : [],
+          total: response.meta?.total || 0,
+          page: response.meta?.page || query.page || 1,
+          pageSize: response.meta?.pageSize || query.pageSize || 20,
         },
       };
     }
+    
     return response;
+  },
+
+  create: async (input: IncidentCreateInput): Promise<ApiResponse<IncidentInfo>> => {
+    return apiRequest<IncidentInfo>({
+      method: 'POST',
+      url: '/api/v1/incidents',
+      data: input,
+    });
   },
 };
 

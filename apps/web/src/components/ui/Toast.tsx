@@ -26,10 +26,13 @@ export const Toast = ({
     info: 'bg-blue-500',
     warning: 'bg-yellow-500',
   };
+  
+  // Si type es 'info', usar el mismo estilo que 'success' pero con color azul
+  const typeClass = type === 'info' ? types.info : types[type];
 
   return (
     <div
-      className={`fixed top-4 right-4 z-50 ${types[type]} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3`}
+      className={`fixed top-4 right-4 z-50 ${typeClass} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3`}
     >
       <span>{message}</span>
       {onClose && (

@@ -34,6 +34,16 @@ httpClient.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    // Si hay error 401 (Unauthorized), limpiar auth y redirigir al login
+    if (error.response?.status === 401) {
+      const { clearAuth } = useAuthStore.getState();
+      clearAuth();
+      // Redirigir al login solo si estamos en el navegador
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    }
+    
     // Si hay error de red o del servidor, lo normalizamos
     if (error.response?.data) {
       return Promise.reject(error.response.data);

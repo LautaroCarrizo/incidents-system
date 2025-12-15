@@ -26,6 +26,7 @@ interface TableHeaderProps {
 interface TableCellProps {
   children: ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 export const Table = ({ children, className = '' }: TableProps) => {
@@ -60,7 +61,14 @@ Table.Header = ({ children, className = '' }: TableHeaderProps) => {
   );
 };
 
-Table.Cell = ({ children, className = '' }: TableCellProps) => {
-  return <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${className}`}>{children}</td>;
+Table.Cell = ({ children, className = '', onClick }: TableCellProps) => {
+  return (
+    <td 
+      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${className} ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
+      {children}
+    </td>
+  );
 };
 
