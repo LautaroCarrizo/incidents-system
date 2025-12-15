@@ -9,7 +9,7 @@ import { AgentsPage } from '../features/agents/pages/AgentsPage';
 import { AssignmentsPage } from '../features/assignments/pages/AssignmentsPage';
 import { UsersPage } from '../features/users/pages/UsersPage';
 import { AccountPage } from '../features/users/pages/AccountPage';
-import { DashboardPage } from '../features/users/pages/DashboardPage';
+import { ForbiddenPage } from '../features/incidents/pages/ForbiddenPage';
 import { useAuthStore } from '../store/authStore';
 
 const ENABLE_AUTH = import.meta.env.VITE_ENABLE_AUTH === 'true';
@@ -21,7 +21,7 @@ const RootRedirect = () => {
 
   const { token } = useAuthStore();
   if (token) {
-    return <Navigate to="/app/incidents" replace />;
+    return <Navigate to="/app/map" replace />;
   }
   return <Navigate to="/login" replace />;
 };
@@ -58,10 +58,25 @@ export const AppRouter = () => {
 
         {/* Protected app routes - bloqueadas si ENABLE_AUTH=false */}
         <Route element={<AppRoutesWrapper />}>
-          <Route path="/app" element={<DashboardPage />} />
+          <Route path="/app" element={<Navigate to="/app/map" replace />} />
+          <Route path="/app/map" element={<MapPage />} />
           <Route path="/app/incidents" element={<IncidentsPage />} />
-          <Route path="/app/agents" element={<AgentsPage />} />
-          <Route path="/app/assignments" element={<AssignmentsPage />} />
+          <Route
+            path="/app/agents"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AgentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/assignments"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AssignmentsPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/app/users"
             element={
@@ -71,6 +86,7 @@ export const AppRouter = () => {
             }
           />
           <Route path="/app/account" element={<AccountPage />} />
+          <Route path="/app/403" element={<ForbiddenPage />} />
         </Route>
 
         {/* Default redirect */}

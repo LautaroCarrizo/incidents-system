@@ -27,7 +27,7 @@ export const ProtectedRoute = ({
 
   // Validar admin si es requerido
   if (requireAdmin && !user.isAdmin) {
-    return <Navigate to="/app/incidents" replace />;
+    return <Navigate to="/app/map" replace />;
   }
 
   return <>{children}</>;

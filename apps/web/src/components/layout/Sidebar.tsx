@@ -1,20 +1,28 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
 
 interface NavItem {
   label: string;
   path: string;
+  adminOnly?: boolean;
 }
 
-const navItems: NavItem[] = [
-  { label: 'Dashboard', path: '/app' },
-  { label: 'Incidents', path: '/app/incidents' },
-  { label: 'Agents', path: '/app/agents' },
-  { label: 'Assignments', path: '/app/assignments' },
-  { label: 'Users', path: '/app/users' },
+const allNavItems: NavItem[] = [
+  { label: 'Mapa', path: '/app/map' },
+  { label: 'Incidentes', path: '/app/incidents' },
+  { label: 'Assignments', path: '/app/assignments', adminOnly: true },
+  { label: 'Agents', path: '/app/agents', adminOnly: true },
+  { label: 'Users', path: '/app/users', adminOnly: true },
 ];
 
 export const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuthStore();
+
+  // Filtrar items según el rol del usuario
+  const navItems = allNavItems.filter(
+    (item) => !item.adminOnly || user?.isAdmin
+  );
 
   return (
     <aside className="w-64 bg-gray-800 text-white min-h-screen">
