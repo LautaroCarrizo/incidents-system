@@ -29,6 +29,15 @@ export async function create(
 
 export async function getById(req: Request<{ id: string }>, res: Response) {
   const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'INVALID_ID',
+        message: 'Invalid incident ID',
+      },
+    });
+  }
   const dto = await incidentService.getByIdOrThrow(id);
   return res.json({ success: true, data: dto });
 }

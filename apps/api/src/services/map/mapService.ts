@@ -35,10 +35,10 @@ class IncidentMapService {
         where.longitude = { [Op.between]: [minLng, maxLng] };
       }
     }
-
+    const safeLimit = Math.min(Math.max(Number((query as any).limit ?? 100) || 100, 1), 500);
     const rows = await IncidentModel.findAll({
       where,
-      limit,
+      limit: safeLimit,
       order: [["createdAt", "DESC"]],
       attributes: [
         "id",
