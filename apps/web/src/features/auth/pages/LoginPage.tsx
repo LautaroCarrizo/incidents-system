@@ -48,7 +48,7 @@ export const LoginPage = () => {
           token: response.data.accessToken,
           user: response.data.user,
         });
-        navigate('/app/incidents', { replace: true });
+        navigate('/app/map', { replace: true });
       } else {
         // Manejar errores del backend
         if (response.error.code === 'UNPROCESSABLE_ENTITY' && response.error.details) {
@@ -72,14 +72,17 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Login</h1>
+    <div className="w-full">
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Bienvenido</h1>
+      <p className="text-gray-600 mb-8">Inicia sesión en tu cuenta</p>
+      
       {generalError && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
           {generalError}
         </div>
       )}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      
+      <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           label="Email"
           type="email"
@@ -97,7 +100,7 @@ export const LoginPage = () => {
           error={errors.password}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
+          {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
         </Button>
       </form>
     </div>
