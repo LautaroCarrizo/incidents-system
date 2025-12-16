@@ -1,18 +1,11 @@
-import dotenvSafe from 'dotenv-safe';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 import { z } from 'zod';
 
-// ESM-safe __dirname / __filename
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Cargar .env usando rutas relativas a apps/api/
-dotenvSafe.config({
-  allowEmptyValues: false,
-  example: path.resolve(__dirname, '../../.env.example'),
-  path: path.resolve(__dirname, '../../.env'),
-});
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config(); // lee .env si existe en el cwd
+}
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']),
