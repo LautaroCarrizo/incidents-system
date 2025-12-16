@@ -20,7 +20,7 @@ export function applyAppMiddlewares(app: Express): void {
 
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,   // ej: http://localhost:5173
+      origin: [env.CORS_ORIGIN, "http://localhost:5174"],   // ej: http://localhost:5173
       credentials: true,         // necesario si usás cookies httpOnly
     })
   );

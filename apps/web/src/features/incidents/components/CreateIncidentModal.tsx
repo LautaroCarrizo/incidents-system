@@ -86,7 +86,6 @@ export const CreateIncidentModal = ({
       });
       onClose();
     } catch (error) {
-      console.error('Error creating incident:', error);
       setErrors({ general: 'Error al crear el incidente. Por favor, intenta nuevamente.' });
     } finally {
       setIsSubmitting(false);

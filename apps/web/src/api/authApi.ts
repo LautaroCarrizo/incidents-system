@@ -7,7 +7,19 @@ interface LoginRequest {
   password: string;
 }
 
+interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  isAdmin?: boolean;
+}
+
 interface LoginResponse {
+  user: User;
+  accessToken: string;
+}
+
+interface RegisterResponse {
   user: User;
   accessToken: string;
 }
@@ -18,6 +30,19 @@ export const authApi = {
       method: 'POST',
       url: '/api/v1/auth/login',
       data: credentials,
+    });
+  },
+
+  register: async (data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> => {
+    return apiRequest<RegisterResponse>({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      data: {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        isAdmin: data.isAdmin ?? false,
+      },
     });
   },
 };

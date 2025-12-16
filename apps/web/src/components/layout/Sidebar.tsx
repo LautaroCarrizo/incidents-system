@@ -8,11 +8,11 @@ interface NavItem {
 }
 
 const allNavItems: NavItem[] = [
-  { label: 'Home', path: '/app/map' },
+  { label: 'Mapa', path: '/app/map' },
   { label: 'Incidentes', path: '/app/incidents' },
-  { label: 'Assignments', path: '/app/assignments', adminOnly: true },
-  { label: 'Agents', path: '/app/agents', adminOnly: true },
-  { label: 'Users', path: '/app/users', adminOnly: true },
+  { label: 'Asignaciones', path: '/app/assignments', adminOnly: true },
+  { label: 'Agentes', path: '/app/agents', adminOnly: true },
+  { label: 'Usuarios', path: '/app/users', adminOnly: true },
 ];
 
 export const Sidebar = () => {

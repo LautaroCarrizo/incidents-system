@@ -6,14 +6,16 @@ import { Input } from '../../../components/ui/Input';
 import { authApi } from '../../../api/authApi';
 import { useAuthStore } from '../../../store/authStore';
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(80, 'Name must be at most 80 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-export const LoginPage = () => {
+export const RegisterPage = () => {
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -26,7 +28,7 @@ export const LoginPage = () => {
     setGeneralError('');
 
     // Validación con zod
-    const validation = loginSchema.safeParse({ email, password });
+    const validation = registerSchema.safeParse({ name, email, password });
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
       validation.error.issues.forEach((issue) => {
@@ -41,7 +43,12 @@ export const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await authApi.login({ email, password });
+      const response = await authApi.register({ 
+        name, 
+        email, 
+        password,
+        isAdmin: false // implícito según requisitos
+      });
 
       if (response.success) {
         setAuth({
@@ -50,7 +57,14 @@ export const LoginPage = () => {
         });
         navigate('/app/map', { replace: true });
       } else {
-        // Manejar errores del backend
+        // Manejar error 409 (Email ya registrado)
+        if (response.error.code === 'CONFLICT') {
+          setGeneralError('Este email ya está registrado. Por favor, inicia sesión o usa otro email.');
+          setErrors({ email: 'Este email ya está registrado' });
+          return;
+        }
+
+        // Manejar errores 422 (Validación)
         if (response.error.code === 'UNPROCESSABLE_ENTITY' && response.error.details) {
           if (typeof response.error.details === 'object') {
             const fieldErrors: Record<string, string> = {};
@@ -62,7 +76,8 @@ export const LoginPage = () => {
             setErrors(fieldErrors);
           }
         }
-        setGeneralError(response.error.message);
+        
+        setGeneralError(response.error.message || 'Error al crear la cuenta. Por favor, intenta de nuevo.');
       }
     } catch (error) {
       setGeneralError('An unexpected error occurred. Please try again.');
@@ -73,8 +88,8 @@ export const LoginPage = () => {
 
   return (
     <div className="w-full">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Bienvenido</h1>
-      <p className="text-gray-600 mb-8">Inicia sesión en tu cuenta</p>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Crear cuenta</h1>
+      <p className="text-gray-600 mb-8">Regístrate para comenzar</p>
       
       {generalError && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
@@ -83,6 +98,14 @@ export const LoginPage = () => {
       )}
       
       <form onSubmit={handleSubmit} className="space-y-5">
+        <Input
+          label="Nombre"
+          type="text"
+          placeholder="Tu nombre"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          error={errors.name}
+        />
         <Input
           label="Email"
           type="email"
@@ -100,15 +123,15 @@ export const LoginPage = () => {
           error={errors.password}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+          {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
         </Button>
       </form>
 
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600">
-          ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-            Crear cuenta
+          ¿Ya tienes una cuenta?{' '}
+          <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+            Inicia sesión
           </Link>
         </p>
       </div>

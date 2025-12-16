@@ -3,6 +3,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { LoginPage } from '../features/auth/pages/LoginPage';
+import { RegisterPage } from '../features/auth/pages/RegisterPage';
 import { MapPage } from '../features/incidents/pages/MapPage';
 import { IncidentsPage } from '../features/incidents/pages/IncidentsPage';
 import { AgentsPage } from '../features/agents/pages/AgentsPage';
@@ -33,6 +34,13 @@ const LoginRedirect = () => {
   return <LoginPage />;
 };
 
+const RegisterRedirect = () => {
+  if (!ENABLE_AUTH) {
+    return <Navigate to="/map" replace />;
+  }
+  return <RegisterPage />;
+};
+
 const AppRoutesWrapper = () => {
   if (!ENABLE_AUTH) {
     return <Navigate to="/map" replace />;
@@ -54,6 +62,7 @@ export const AppRouter = () => {
         {/* Auth routes - bloqueadas si ENABLE_AUTH=false */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginRedirect />} />
+          <Route path="/register" element={<RegisterRedirect />} />
         </Route>
 
         {/* Protected app routes - bloqueadas si ENABLE_AUTH=false */}

@@ -4,7 +4,6 @@ import { Input } from '../../../components/ui/Input';
 export const AccountPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Change password');
     // TODO: Implementar cambio de contraseña
   };
 

@@ -9,7 +9,7 @@ export const Topbar = () => {
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link to="/app" className="text-xl font-semibold text-gray-900">
+          <Link to="/app/map" className="text-xl font-semibold text-gray-900">
             Incidents System
           </Link>
         </div>
@@ -18,7 +18,7 @@ export const Topbar = () => {
             <>
               <span className="text-sm text-gray-700">{user.email}</span>
               <Button variant="secondary" size="sm" onClick={clearAuth}>
-                Logout
+                Cerrar sesión
               </Button>
             </>
           )}

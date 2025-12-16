@@ -8,9 +8,9 @@ const CORDOBA_LNG = -64.1888;
 
 export const AuthLayout = () => {
   const location = useLocation();
-  const isLoginPage = location.pathname === '/login';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
-  if (isLoginPage) {
+  if (isAuthPage) {
     return (
       <div className="min-h-screen flex">
         {/* Mapa - 60% */}
