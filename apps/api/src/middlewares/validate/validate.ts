@@ -27,12 +27,7 @@ export function validate(schema: ZodSchema<any>, source: Source = "body"): Reque
       // Aplicamos el resultado SIN reasignar propiedades de solo-lectura
 
       if (source === "query") {
-        // Express 5: req.query es getter; no reasignar, solo mutar su contenido
-        const q = req.query as Record<string, unknown>;
-        // limpiar claves previas para evitar residuos
-        for (const k of Object.keys(q)) delete q[k];
-        // copiar las nuevas validadas/parseadas
-        Object.assign(q, parsed.data);
+        Object.assign(req.query as Record<string, unknown>, parsed.data);
       } else if (source === "params") {
         Object.assign(req.params as Record<string, unknown>, parsed.data);
       } else {

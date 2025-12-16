@@ -17,6 +17,8 @@ export interface IncidentListDto {
   id: number;
   typeIncident: IncidentType;
   status: string;
+  latitude: number | null;
+  longitude: number | null;
   createdAt: string;
   address: string | null;
 }
@@ -41,6 +43,8 @@ export function toIncidentListDto(row: any): IncidentListDto {
     id: row.id,
     typeIncident: row.typeIncident,
     status: row.status,
+    latitude: row.latitude !== null ? Number(row.latitude) : null,
+    longitude: row.longitude !== null ? Number(row.longitude) : null,
     address: row.address ?? null,
     createdAt: row.createdAt?.toISOString?.() ?? String(row.createdAt),
   };
