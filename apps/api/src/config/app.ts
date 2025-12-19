@@ -47,8 +47,13 @@ export function applyAppMiddlewares(app: Express): void {
 
   app.use(cors(corsOptions));
 
-  // ✅ Responder preflight
-  app.options(/.*/, cors(corsOptions));
+  // ✅ Responder preflight (Express 5 compatible)
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      return cors(corsOptions)(req, res, next);
+    }
+    next();
+  });
 
   app.use(cookieParser());
   app.use(compression());
