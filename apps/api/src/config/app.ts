@@ -31,7 +31,6 @@ export function applyAppMiddlewares(app: Express): void {
 
   const corsOptions: CorsOptions = {
     origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-      // requests sin Origin (Postman, curl, server-to-server) → permitir
       if (!origin) return callback(null, true);
 
       if (finalAllowed.includes(origin)) return callback(null, true);
