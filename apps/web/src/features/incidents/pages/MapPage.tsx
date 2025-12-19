@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import { divIcon, type Map } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { incidentsApi, type IncidentGeoFeature, type IncidentCreateInput } from '../../../api/incidentsApi';
+import { incidentsApi, type IncidentGeoFeature, type IncidentCreateInput, buildBBoxFromBounds } from '../../../api/incidentsApi';
 import { CreateIncidentModal } from '../components/CreateIncidentModal';
 import { Toast } from '../../../components/ui/Toast';
 
@@ -249,10 +249,25 @@ export const MapPage = () => {
     }
   }, []);
 
+  // Cargar incidentes: siempre habilitado, bbox solo si es válido
   const { data, isLoading, error: queryError } = useQuery({
     queryKey: ['incidents-geo', bbox],
-    queryFn: () => incidentsApi.getGeo({ bbox: bbox || undefined, limit: 200 }),
-    enabled: !!bbox,
+    queryFn: () => {
+      // Validar bbox antes de enviarlo usando la función helper
+      const validBbox = bbox ? (() => {
+        const parts = bbox.split(',');
+        if (parts.length !== 4) return undefined;
+        const [minLng, minLat, maxLng, maxLat] = parts.map(Number);
+        const validated = buildBBoxFromBounds({ minLng, minLat, maxLng, maxLat });
+        return validated || undefined;
+      })() : undefined;
+      
+      return incidentsApi.getGeo({ 
+        bbox: validBbox, 
+        limit: 200 
+      });
+    },
+    enabled: true, // Siempre habilitado para cargar todos los incidentes al inicio
   });
 
   const createMutation = useMutation({
