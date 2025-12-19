@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const compression = require('compression');
 const cors = require('cors');
-
+import type { CorsOptions } from "cors";
 
 
 export function applyAppMiddlewares(app: Express): void {
@@ -29,26 +29,26 @@ export function applyAppMiddlewares(app: Express): void {
   const devFallback = ["http://localhost:5173", "http://localhost:5174"];
   const finalAllowed = Array.from(new Set([...allowedOrigins, ...devFallback]));
 
-  app.use(
-    cors({
-      origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-        // requests sin Origin (Postman, curl, server-to-server) → permitir
-        if (!origin) return callback(null, true);
+  const corsOptions: CorsOptions = {
+    origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+      // requests sin Origin (Postman, curl, server-to-server) → permitir
+      if (!origin) return callback(null, true);
 
-        if (finalAllowed.includes(origin)) return callback(null, true);
+      if (finalAllowed.includes(origin)) return callback(null, true);
 
-        return callback(new Error(`CORS: Origin not allowed: ${origin}`));
-      },
-      credentials: true,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      exposedHeaders: ["x-request-id"],
-      maxAge: 86400,
-    })
-  );
+      return callback(new Error(`CORS: Origin not allowed: ${origin}`));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["x-request-id"],
+    maxAge: 86400,
+  };
+
+  app.use(cors(corsOptions));
 
   // ✅ Responder preflight
-  app.options("*", cors());
+  app.options(/.*/, cors(corsOptions));
 
   app.use(cookieParser());
   app.use(compression());
