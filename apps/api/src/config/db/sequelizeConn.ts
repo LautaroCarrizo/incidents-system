@@ -3,7 +3,7 @@ import { env } from "../env.js";
 import { logger } from "../logger.js";
 export const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PASS, {
   host: env.DB_HOST,
-  port: env.DB_PORT || 3000,
+  port: env.DB_PORT || 3306,
   dialect: "mysql",
   pool: {
     max: env.DB_CONN_MAX,
