@@ -372,6 +372,17 @@ export const MapPage = () => {
     }
   }, [isCreateModalOpen, selectedPosition]);
 
+  // Limpiar el mensaje de error de ubicación después de 2 segundos
+  useEffect(() => {
+    if (locationError) {
+      const timer = setTimeout(() => {
+        setLocationError(null);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [locationError]);
+
   return (
     <div className="h-screen flex flex-col relative">
       {/* Botón Mi Ubicación */}
