@@ -6,10 +6,8 @@ export async function connectDB(): Promise<void> {
     await import("../../models/relations/applyRelations.js");
     await sequelize.authenticate();
     logger.info("✅ Conectado a MySQL");
-    if (env.NODE_ENV !== "production") {
-      await sequelize.sync({ alter: true });
-      logger.info("🛠️  Sequelize sync (alter) completado");
-    }
+    await sequelize.sync({ alter: true });
+    logger.info("🛠️  Sequelize sync (alter) completado");
   } catch (err) {
     logger.error({ err }, "❌ Error conectando a MySQL");
     process.exit(1);
