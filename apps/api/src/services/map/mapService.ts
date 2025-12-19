@@ -29,10 +29,18 @@ class IncidentMapService {
     if (typeIncident) where.typeIncident = typeIncident;
 
     if (bbox) {
-      const [minLng, minLat, maxLng, maxLat] = bbox.split(",").map(Number);
-      if ([minLng, minLat, maxLng, maxLat].every(Number.isFinite)) {
-        where.latitude = { [Op.between]: [minLat, maxLat] };
-        where.longitude = { [Op.between]: [minLng, maxLng] };
+      const parts = bbox.split(",").map(Number);
+      
+      if (parts.length === 4 && parts.every(Number.isFinite)) {
+        const [minLng, minLat, maxLng, maxLat] = parts as [number, number, number, number];
+        
+        const normalizedMinLng = Math.min(minLng, maxLng);
+        const normalizedMaxLng = Math.max(minLng, maxLng);
+        const normalizedMinLat = Math.min(minLat, maxLat);
+        const normalizedMaxLat = Math.max(minLat, maxLat);
+        
+        where.latitude = { [Op.between]: [normalizedMinLat, normalizedMaxLat] };
+        where.longitude = { [Op.between]: [normalizedMinLng, normalizedMaxLng] };
       }
     }
     const safeLimit = Math.min(Math.max(Number((query as any).limit ?? 100) || 100, 1), 500);
